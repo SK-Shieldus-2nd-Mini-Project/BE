@@ -2,12 +2,16 @@ package com.rookies4.MiniProject2.domain.entity;
 
 import com.rookies4.MiniProject2.domain.enums.Role;
 import jakarta.persistence.*;
+import java.util.Collections;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
+import org.springframework.security.core.GrantedAuthority;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
+import org.springframework.security.core.userdetails.UserDetails;
 
 @Entity
 @Table(name = "users")
@@ -52,5 +56,16 @@ public class User {
         this.birthdate = birthdate;
         this.profileImageUrl = profileImageUrl;
         this.role = role;
+    }
+
+    // 현재 User 엔티티 정보를 바탕으로 Spring Security의 UserDetails 객체 생성
+    public UserDetails toUserDetails() {
+        GrantedAuthority grantedAuthority = new SimpleGrantedAuthority(this.role.toString());
+
+        return new org.springframework.security.core.userdetails.User(
+                this.username,
+                this.password,
+                Collections.singleton(grantedAuthority)
+        );
     }
 }
