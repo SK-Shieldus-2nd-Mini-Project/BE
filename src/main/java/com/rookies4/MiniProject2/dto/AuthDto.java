@@ -1,5 +1,6 @@
 package com.rookies4.MiniProject2.dto;
 
+import com.fasterxml.jackson.annotation.JsonPropertyOrder;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import lombok.Getter;
@@ -41,6 +42,7 @@ public class AuthDto {
     }
 
     @Getter
+    @JsonPropertyOrder({"grantType", "accessToken", "expiresIn"})
     public static class TokenResponse {
         private String grantType = "Bearer";
         private String accessToken;
