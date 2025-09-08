@@ -1,6 +1,8 @@
 package com.rookies4.MiniProject2.domain.entity;
 
 import jakarta.persistence.*;
+import lombok.AllArgsConstructor; // import 추가
+import lombok.Builder;       // import 추가
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import java.time.LocalDateTime;
@@ -9,6 +11,8 @@ import java.time.LocalDateTime;
 @Table(name = "schedules")
 @Getter
 @NoArgsConstructor
+@AllArgsConstructor // Builder를 위해 추가
+@Builder            // Builder 어노테이션 추가
 public class Schedule {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)

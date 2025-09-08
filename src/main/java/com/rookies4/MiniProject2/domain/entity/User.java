@@ -1,9 +1,10 @@
+// src/main/java/com/rookies4/MiniProject2/domain/entity/User.java
 package com.rookies4.MiniProject2.domain.entity;
 
 import com.rookies4.MiniProject2.domain.enums.Role;
 import jakarta.persistence.*;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
+import lombok.*;
+
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
@@ -11,8 +12,12 @@ import java.util.List;
 @Entity
 @Table(name = "users")
 @Getter
+@Setter
 @NoArgsConstructor
+@AllArgsConstructor // 이 어노테이션을 추가하세요.
+@Builder            // 이 어노테이션을 추가하세요.
 public class User {
+    // ... 기존 코드는 그대로 ...
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "user_id")
