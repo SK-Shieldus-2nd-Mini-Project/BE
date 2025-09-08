@@ -2,6 +2,7 @@ package com.rookies4.MiniProject2.domain.entity;
 
 import com.rookies4.MiniProject2.domain.enums.Role;
 import jakarta.persistence.*;
+import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import java.time.LocalDate;
@@ -42,4 +43,14 @@ public class User {
 
     @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<GroupMember> groupMembers = new ArrayList<>();
+
+    @Builder
+    public User(String username, String password, String nickname, LocalDate birthdate, String profileImageUrl, Role role) {
+        this.username = username;
+        this.password = password;
+        this.nickname = nickname;
+        this.birthdate = birthdate;
+        this.profileImageUrl = profileImageUrl;
+        this.role = role;
+    }
 }
