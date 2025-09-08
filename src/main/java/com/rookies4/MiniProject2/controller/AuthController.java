@@ -1,6 +1,7 @@
 package com.rookies4.MiniProject2.controller;
 
 import com.rookies4.MiniProject2.dto.AuthDto;
+import com.rookies4.MiniProject2.service.AuthService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
@@ -14,14 +15,18 @@ import org.springframework.web.bind.annotation.RestController;
 @RequestMapping("/api/auth")
 @RequiredArgsConstructor
 public class AuthController {
-    // private final AuthService authService; // TODO: AuthService 주입
+    private final AuthService authService;
 
+    /**
+     * 회원가입 API 엔드포인트
+     * @param: requestDto 회원가입 요청 Body
+     * @return: 생성된 사용자 정보와 201 Created 상태 코드
+     */
     @PostMapping("/signup")
     public ResponseEntity<AuthDto.SignUpResponse> signup(@Valid @RequestBody AuthDto.SignUpRequest request) {
-        // TODO: authService.signup(request) 호출
-        // AuthDto.SignUpResponse response = authService.signup(request);
-        // return ResponseEntity.status(HttpStatus.CREATED).body(response);
-        return null; // 임시
+        AuthDto.SignUpResponse response = authService.signup(request);
+
+        return ResponseEntity.status(HttpStatus.CREATED).body(response);
     }
 
     @PostMapping("/login")
