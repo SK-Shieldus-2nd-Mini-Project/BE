@@ -40,8 +40,8 @@ public class JwtTokenProvider {
                 .collect(Collectors.joining(","));
 
         long now = (new Date()).getTime();
-        // Access Token 생성 (유효시간: 30분)
-        Date accessTokenExpiresIn = new Date(now + 1800000);
+        // Access Token 생성 (유효시간: 60분)
+        Date accessTokenExpiresIn = new Date(now + 3600000);
         String accessToken = Jwts.builder()
                 .setSubject(authentication.getName())
                 .claim("auth", authorities)
