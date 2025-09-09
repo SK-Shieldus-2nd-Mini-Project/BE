@@ -43,7 +43,7 @@ public class DataLoader implements CommandLineRunner {
         if (sportRepository.count() == 0) {
             System.out.println("운동 종목 데이터 초기화 시작...");
             List<String> sports = List.of(
-                "배드민턴", "축구", "농구", "런닝"
+                "농구", "등산", "러닝", "배드민턴", "볼링", "야구", "자전거", "족구", "축구", "탁구"
             );
             sports.forEach(name -> {
                 Sport sport = new Sport();
@@ -53,4 +53,5 @@ public class DataLoader implements CommandLineRunner {
             System.out.println("운동 종목 데이터 초기화 완료.");
         }
     }
+
 }
