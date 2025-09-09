@@ -3,6 +3,7 @@ package com.rookies4.MiniProject2.exception;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.AccessDeniedException;
+import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
@@ -21,6 +22,17 @@ public class GlobalExceptionHandler {
         log.error("handleMethodArgumentNotValidException", e);
         final ErrorResponse response = ErrorResponse.of(ErrorCode.INVALID_INPUT_VALUE, e.getBindingResult().getFieldError());
         return ResponseEntity.badRequest().body(response);
+    }
+
+    /**
+     * 로그인 시 아이디 또는 비밀번호가 일치하지 않을 때 발생하는 예외를 처리합니다.
+     * HTTP 401 Unauthorized 상태와 함께 에러 메시지를 응답합니다.
+     */
+    @ExceptionHandler(BadCredentialsException.class)
+    protected ResponseEntity<ErrorResponse> handleBadCredentialsException(BadCredentialsException e) {
+        log.error("handleBadCredentialsException", e);
+        final ErrorResponse response = ErrorResponse.of(ErrorCode.INVALID_CREDENTIALS);
+        return ResponseEntity.status(ErrorCode.INVALID_CREDENTIALS.getStatus()).body(response);
     }
 
     /**
@@ -59,6 +71,17 @@ public class GlobalExceptionHandler {
         log.error("handleUsernameNotFoundException", e);
         final ErrorResponse response = ErrorResponse.of(ErrorCode.USER_NOT_FOUND);
         return ResponseEntity.status(ErrorCode.USER_NOT_FOUND.getStatus()).body(response);
+    }
+
+    /**
+     * CustomException을 처리합니다.
+     * ErrorCode에 정의된 상태 코드와 메시지를 기반으로 응답합니다.
+     */
+    @ExceptionHandler(CustomException.class)
+    protected ResponseEntity<ErrorResponse> handleCustomException(CustomException e) {
+        log.error("handleCustomException", e);
+        final ErrorResponse response = ErrorResponse.of(e.getErrorCode());
+        return ResponseEntity.status(e.getErrorCode().getStatus()).body(response);
     }
 
 
