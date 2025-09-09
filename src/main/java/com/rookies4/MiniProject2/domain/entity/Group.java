@@ -2,8 +2,12 @@ package com.rookies4.MiniProject2.domain.entity;
 
 import com.rookies4.MiniProject2.domain.enums.ApprovalStatus;
 import jakarta.persistence.*;
+import lombok.AllArgsConstructor; // import 추가
+import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import lombok.Setter;
+
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
@@ -11,7 +15,10 @@ import java.util.List;
 @Entity
 @Table(name = "groups")
 @Getter
+@Setter
 @NoArgsConstructor
+@AllArgsConstructor // Builder를 위해 추가
+@Builder            // Builder 어노테이션 추가
 public class Group {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -45,16 +52,21 @@ public class Group {
 
     @Column(name = "created_at", nullable = false, updatable = false)
     private LocalDateTime createdAt;
-    
+
+    @Builder.Default // 빌더 사용 시에도 기본값으로 초기화되도록 설정
     @OneToMany(mappedBy = "group", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<GroupMember> members = new ArrayList<>();
 
+    @Builder.Default // 빌더 사용 시에도 기본값으로 초기화되도록 설정
     @OneToMany(mappedBy = "group", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<Schedule> schedules = new ArrayList<>();
 
     @PrePersist
     protected void onCreate() {
         this.createdAt = LocalDateTime.now();
-        this.approvalStatus = ApprovalStatus.PENDING;
+        // approvalStatus가 null일 경우에만 PENDING으로 기본값 설정
+        if (this.approvalStatus == null) {
+            this.approvalStatus = ApprovalStatus.PENDING;
+        }
     }
 }

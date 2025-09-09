@@ -2,36 +2,17 @@ package com.rookies4.MiniProject2.domain.entity;
 
 import com.rookies4.MiniProject2.domain.enums.JoinStatus;
 import jakarta.persistence.*;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import java.io.Serializable;
+import lombok.*;
 import java.time.LocalDateTime;
-import java.util.Objects;
-
-// 복합키 클래스
-class GroupMemberId implements Serializable {
-    private Long user;
-    private Long group;
-
-    @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
-        GroupMemberId that = (GroupMemberId) o;
-        return Objects.equals(user, that.user) && Objects.equals(group, that.group);
-    }
-
-    @Override
-    public int hashCode() {
-        return Objects.hash(user, group);
-    }
-}
 
 @Entity
 @Table(name = "group_members")
 @IdClass(GroupMemberId.class)
 @Getter
+@Setter
 @NoArgsConstructor
+@AllArgsConstructor // Builder를 위해 추가
+@Builder            // Builder 어노테이션 추가
 public class GroupMember {
     @Id
     @ManyToOne(fetch = FetchType.LAZY)
@@ -53,6 +34,9 @@ public class GroupMember {
     @PrePersist
     protected void onApply() {
         this.appliedAt = LocalDateTime.now();
-        this.status = JoinStatus.PENDING;
+        // status가 null일 경우에만 PENDING으로 기본값 설정
+        if (this.status == null) {
+            this.status = JoinStatus.PENDING;
+        }
     }
 }

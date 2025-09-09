@@ -1,10 +1,10 @@
+// src/main/java/com/rookies4/MiniProject2/domain/entity/User.java
 package com.rookies4.MiniProject2.domain.entity;
 
 import com.rookies4.MiniProject2.domain.enums.Role;
 import jakarta.persistence.*;
-import lombok.Builder;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
+import lombok.*;
+
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
@@ -12,8 +12,12 @@ import java.util.List;
 @Entity
 @Table(name = "users")
 @Getter
+@Setter
 @NoArgsConstructor
+@AllArgsConstructor
+@Builder
 public class User {
+
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "user_id")
@@ -43,14 +47,4 @@ public class User {
 
     @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<GroupMember> groupMembers = new ArrayList<>();
-
-    @Builder
-    public User(String username, String password, String nickname, LocalDate birthdate, String profileImageUrl, Role role) {
-        this.username = username;
-        this.password = password;
-        this.nickname = nickname;
-        this.birthdate = birthdate;
-        this.profileImageUrl = profileImageUrl;
-        this.role = role;
-    }
 }
