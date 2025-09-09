@@ -34,5 +34,6 @@ build/
 /logs/spring.log
 
 ###민감한 정보가 포함된 설정 파일은 Git에서 제외합니다.
-application-prod.properties
+/logs/spring.log
 application-*.properties
+application.properties

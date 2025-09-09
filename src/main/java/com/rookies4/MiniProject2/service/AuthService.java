@@ -13,7 +13,9 @@ import org.springframework.security.core.Authentication;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import lombok.extern.slf4j.Slf4j; // [추가] Slf4j import
 
+@Slf4j
 @Service
 @RequiredArgsConstructor
 public class AuthService {
@@ -31,7 +33,7 @@ public class AuthService {
             throw new IllegalArgumentException("이미 사용 중인 닉네임입니다.");
         }
 
-        User user = User.builder()
+        User userToSave = User.builder()
                 .username(request.getUsername())
                 .password(passwordEncoder.encode(request.getPassword()))
                 .nickname(request.getNickname())
@@ -39,13 +41,15 @@ public class AuthService {
                 .profileImageUrl(request.getProfileImageUrl())
                 .role(Role.USER) // 기본 역할은 USER
                 .build();
-        
-        userRepository.save(user);
-        
+
+        // [수정] save() 메서드가 반환하는 영속화된 User 객체를 받습니다.
+        User savedUser = userRepository.save(userToSave);
+
+        // [수정] id가 부여된 savedUser 객체를 사용하여 응답을 생성합니다.
         return AuthDto.SignUpResponse.builder()
-                .userId(user.getId())
-                .username(user.getUsername())
-                .nickname(user.getNickname())
+                .userId(savedUser.getId())
+                .username(savedUser.getUsername())
+                .nickname(savedUser.getNickname())
                 .build();
     }
 

@@ -4,10 +4,14 @@ import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import lombok.Getter;
 import lombok.Builder;
+import lombok.*;
 import java.time.LocalDate;
 
 public class AuthDto {
     @Getter
+    @Builder // [추가] 테스트에서 객체 생성을 쉽게 하기 위해 Builder 추가
+    @NoArgsConstructor(access = AccessLevel.PROTECTED) // [추가] JPA 프록시 등을 위한 기본 생성자
+    @AllArgsConstructor // [추가] Builder를 위한 모든 필드를 받는 생성자
     public static class SignUpRequest {
         @NotBlank(message = "아이디는 필수 입력 항목입니다.")
         private String username;

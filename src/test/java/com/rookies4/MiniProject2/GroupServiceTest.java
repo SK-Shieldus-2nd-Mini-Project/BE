@@ -1,10 +1,12 @@
-package com.rookies4.MiniProject2.service;
+package com.rookies4.MiniProject2;
+
 
 import com.rookies4.MiniProject2.domain.entity.*;
 import com.rookies4.MiniProject2.domain.enums.JoinStatus;
 import com.rookies4.MiniProject2.dto.GroupDto;
 import com.rookies4.MiniProject2.repository.GroupMemberRepository;
 import com.rookies4.MiniProject2.repository.UserRepository;
+import com.rookies4.MiniProject2.service.GroupService;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
