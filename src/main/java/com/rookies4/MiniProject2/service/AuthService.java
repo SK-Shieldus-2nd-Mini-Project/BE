@@ -3,9 +3,12 @@ package com.rookies4.MiniProject2.service;
 import com.rookies4.MiniProject2.domain.entity.User;
 import com.rookies4.MiniProject2.domain.enums.Role;
 import com.rookies4.MiniProject2.dto.AuthDto;
+import com.rookies4.MiniProject2.exception.CustomException;
+import com.rookies4.MiniProject2.exception.ErrorCode;
 import com.rookies4.MiniProject2.jwt.JwtTokenProvider;
 import com.rookies4.MiniProject2.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
+import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
 import org.springframework.security.core.Authentication;
@@ -62,14 +65,30 @@ public class AuthService {
     // 로그인
     @Transactional
     public AuthDto.TokenResponse login(AuthDto.LoginRequest requestDto) {
+        // 닉네임 길이 검사 (2자 이상 10자 이하)
+        validateUsername(requestDto.getUsername());
+
         // login ID/PW 기반으로 AuthenticationToken 생성
         UsernamePasswordAuthenticationToken authenticationToken =
                 new UsernamePasswordAuthenticationToken(requestDto.getUsername(), requestDto.getPassword());
 
-        // 사용자 비밀번호 체크
-        Authentication authentication = authenticationManagerBuilder.getObject().authenticate(authenticationToken);
+        Authentication authentication;
+        try {
+            // 사용자 비밀번호 체크
+            authentication = authenticationManagerBuilder.getObject().authenticate(authenticationToken);
+        } catch (BadCredentialsException e) {
+            // 아이디 또는 비밀번호가 올바르지 않으면 INVALID_CREDENTIALS 에러 발생
+            throw new CustomException(ErrorCode.INVALID_CREDENTIALS);
+        }
 
         // 인증 정보 기반으로 JWT 토큰 생성 및 반환
         return jwtTokenProvider.generateToken(authentication);
+    }
+
+    // 닉네임 길이 검사 메서드
+    private void validateUsername(String username) {
+        if (username == null || username.length() < 2 || username.length() > 10) {
+            throw new CustomException(ErrorCode.VALIDATION_ERROR);
+        }
     }
 }
