@@ -22,6 +22,8 @@ public class AdminController {
     private final GroupService groupService;
     private final UserService userService; // UserService 의존성 주입 추가
 
+    // ==================== 모임 관리 ====================
+
     // 승인 대기 모임 목록 조회
     @GetMapping("/groups/pending")
     public ResponseEntity<List<GroupDto.MyGroupResponse>> getPendingGroups() {
@@ -43,7 +45,24 @@ public class AdminController {
         return ResponseEntity.noContent().build();
     }
 
-    // ======== 관리자용 회원 정보 수정 API (추가) ========
+
+    // [추가] 전체 모임 목록 조회 (필터링 없이)
+    @GetMapping("/groups")
+    public ResponseEntity<List<GroupDto.MyGroupResponse>> getAllGroups() {
+        // 기존 GroupService의 getAllApprovedGroups 메서드를 재활용하되, 파라미터를 null로 전달
+        return ResponseEntity.ok(groupService.getAllApprovedGroups(null, null));
+    }
+
+
+    // ==================== 회원 관리 (추가된 기능) ====================
+
+    // [추가] 전체 회원 목록 조회
+    @GetMapping("/users")
+    public ResponseEntity<List<UserDto.UserInfoResponse>> getAllUsers() {
+        return ResponseEntity.ok(userService.getAllUsers());
+    }
+
+    // 관리자용 회원 정보 수정
     @PutMapping("/users/{userId}")
     public ResponseEntity<Void> updateUserByAdmin(
             @PathVariable Long userId,
@@ -51,5 +70,12 @@ public class AdminController {
 
         userService.updateUserByAdmin(userId, request);
         return ResponseEntity.ok().build();
+    }
+
+    // [추가] 관리자용 회원 강제 탈퇴
+    @DeleteMapping("/users/{userId}")
+    public ResponseEntity<Void> deleteUserByAdmin(@PathVariable Long userId) {
+        userService.deleteUserByAdmin(userId);
+        return ResponseEntity.noContent().build();
     }
 }

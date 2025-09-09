@@ -17,6 +17,7 @@ import jakarta.persistence.criteria.Predicate;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 @Service
 @RequiredArgsConstructor
@@ -64,6 +65,38 @@ public class GroupService {
 
         // 그룹 삭제
         groupRepository.delete(group);
+    }
+
+    // [수정] 메서드명 변경 및 로직 분리: getMyGroups -> findMyJoinedGroups
+    public List<GroupDto.MyGroupResponse> findMyJoinedGroups(String username) {
+        User user = userRepository.findByUsername(username)
+                .orElseThrow(() -> new UsernameNotFoundException("사용자를 찾을 수 없습니다."));
+
+        return groupMemberRepository.findByUserAndStatus(user, JoinStatus.APPROVED)
+                .stream()
+                .map(groupMember -> new GroupDto.MyGroupResponse(groupMember.getGroup()))
+                .collect(Collectors.toList());
+    }
+
+    // [추가] 내가 만든 모임 + 내가 가입한 모임 목록 조회
+    public List<GroupDto.MyGroupResponse> getMyAllGroups(String username) {
+        User user = userRepository.findByUsername(username)
+                .orElseThrow(() -> new UsernameNotFoundException("사용자를 찾을 수 없습니다."));
+
+        // 1. 내가 가입한 모임 목록 조회
+        List<Group> joinedGroups = groupMemberRepository.findByUserAndStatus(user, JoinStatus.APPROVED)
+                .stream()
+                .map(GroupMember::getGroup)
+                .toList();
+
+        // 2. 내가 팀장인 모임 목록 조회 (User 엔티티에서 직접 가져옴)
+        List<Group> leadingGroups = user.getLeadingGroups();
+
+        // 3. 두 리스트를 합치고 중복을 제거한 후 DTO로 변환하여 반환
+        return Stream.concat(joinedGroups.stream(), leadingGroups.stream())
+                .distinct() // 중복된 모임 제거 (팀장이 멤버로도 등록되는 경우를 대비)
+                .map(GroupDto.MyGroupResponse::new)
+                .collect(Collectors.toList());
     }
 
     // [사용자] 나의 모임 목록 조회

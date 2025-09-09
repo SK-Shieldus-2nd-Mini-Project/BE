@@ -1,7 +1,9 @@
 package com.rookies4.MiniProject2.service;
 
+import com.rookies4.MiniProject2.domain.entity.Group;
 import com.rookies4.MiniProject2.domain.entity.User;
 import com.rookies4.MiniProject2.dto.UserDto;
+import com.rookies4.MiniProject2.repository.GroupRepository;
 import com.rookies4.MiniProject2.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
@@ -10,6 +12,9 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.StringUtils;
 
+import java.util.List;
+import java.util.stream.Collectors;
+
 @Service
 @RequiredArgsConstructor
 @Transactional(readOnly = true)
@@ -17,6 +22,7 @@ public class UserService {
 
     private final UserRepository userRepository;
     private final PasswordEncoder passwordEncoder;
+    private final GroupRepository groupRepository; // GroupRepository 의존성 주입
 
     // 내 정보 조회
     public UserDto.UserInfoResponse getMyInfo(String username) {
@@ -25,7 +31,6 @@ public class UserService {
         return UserDto.UserInfoResponse.builder().user(user).build();
     }
 
-    // 내 정보 수정
     /**
      * 내 정보 수정 (닉네임 중복 검사 포함)
      */
@@ -64,7 +69,36 @@ public class UserService {
     public void deleteUser(String username) {
         User user = userRepository.findByUsername(username)
                 .orElseThrow(() -> new UsernameNotFoundException("사용자를 찾을 수 없습니다."));
-        // 회원 탈퇴 시 팀장으로 있는 모임 처리 로직 필요 (위임 또는 해체)
+
+        // 사용자가 팀장으로 있는 모임이 있는지 확인하고, 있다면 모두 삭제 (모임 해산)
+        List<Group> leadingGroups = user.getLeadingGroups();
+        if (leadingGroups != null && !leadingGroups.isEmpty()) {
+            // Group 엔티티의 cascade 설정에 따라 연관된 GroupMember, Schedule도 함께 삭제됨
+            groupRepository.deleteAll(leadingGroups);
+        }
+
+        userRepository.delete(user);
+    }
+    // ======== 관리자용 기능 ========
+
+    // [추가] 전체 회원 목록 조회
+    public List<UserDto.UserInfoResponse> getAllUsers() {
+        return userRepository.findAll().stream()
+                .map(user -> UserDto.UserInfoResponse.builder().user(user).build())
+                .collect(Collectors.toList());
+    }
+
+    // [추가] 관리자에 의한 회원 강제 탈퇴
+    @Transactional
+    public void deleteUserByAdmin(Long userId) {
+        User user = userRepository.findById(userId)
+                .orElseThrow(() -> new UsernameNotFoundException("ID " + userId + "에 해당하는 사용자를 찾을 수 없습니다."));
+
+        // 기존 deleteUser 로직과 동일하게 팀장으로 있는 모임 처리
+        List<Group> leadingGroups = user.getLeadingGroups();
+        if (leadingGroups != null && !leadingGroups.isEmpty()) {
+            groupRepository.deleteAll(leadingGroups);
+        }
         userRepository.delete(user);
     }
 

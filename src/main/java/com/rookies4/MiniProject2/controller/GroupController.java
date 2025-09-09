@@ -57,13 +57,6 @@ public class GroupController {
         return ResponseEntity.noContent().build();
     }
 
-
-    // 나의 모임 목록 조회
-    @GetMapping("/my")
-    public ResponseEntity<List<GroupDto.MyGroupResponse>> getMyGroups(@AuthenticationPrincipal UserDetails userDetails) {
-        return ResponseEntity.ok(groupService.getMyGroups(userDetails.getUsername()));
-    }
-
     // 모임 상세 조회
     @GetMapping("/{groupId}")
     public ResponseEntity<GroupDto.GroupDetailResponse> getGroupDetails(@PathVariable Long groupId) {
