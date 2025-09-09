@@ -17,7 +17,7 @@ import org.springframework.security.web.authentication.UsernamePasswordAuthentic
 @Configuration
 @RequiredArgsConstructor // final 필드에 대한 생성자 자동 생성
 @EnableWebSecurity //스프링 시큐리티 활성화
-//@EnableMethodSecurity // @PreAuthorize 어노테이션 사용을 위함
+@EnableMethodSecurity // @PreAuthorize 어노테이션 사용을 위함
 public class SecurityConfig {
 
     // 직접 만든 JWT 관련 클래스들
