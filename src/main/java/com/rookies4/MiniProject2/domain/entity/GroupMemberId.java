@@ -1,15 +1,12 @@
-// src/main/java/com/rookies4/MiniProject2/domain/entity/GroupMemberId.java
 package com.rookies4.MiniProject2.domain.entity;
 
 import java.io.Serializable;
 import java.util.Objects;
 
-// public으로 선언해야 다른 패키지에서 접근 가능합니다.
 public class GroupMemberId implements Serializable {
     private Long user;
     private Long group;
 
-    // hashCode and equals 구현
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;

@@ -24,7 +24,7 @@ public class UserService {
 
     private final UserRepository userRepository;
     private final PasswordEncoder passwordEncoder;
-    private final GroupRepository groupRepository; // GroupRepository 의존성 주입
+    private final GroupRepository groupRepository;
 
     // 내 정보 조회
     public UserDto.UserInfoResponse getMyInfo(String username) {
@@ -36,6 +36,7 @@ public class UserService {
     /**
      * 내 정보 수정 (닉네임 중복 검사 포함)
      */
+
     @Transactional
     public void updateMyInfo(String username, UserDto.UpdateRequest request) {
         User user = userRepository.findByUsername(username)
@@ -59,7 +60,7 @@ public class UserService {
             user.setProfileImageUrl(request.getProfileImageUrl());
         }
 
-        // ======== 4. 비밀번호 변경 로직 (추가) ========
+        // 4. 비밀번호 변경 로직
         if (StringUtils.hasText(request.getPassword())) {
             // 새 비밀번호를 암호화하여 설정
             user.setPassword(passwordEncoder.encode(request.getPassword()));
@@ -81,16 +82,17 @@ public class UserService {
 
         userRepository.delete(user);
     }
-    // ======== 관리자용 기능 ========
 
-    // [추가] 전체 회원 목록 조회
+    // 관리자용 기능
+
+    // 전체 회원 목록 조회
     public List<UserDto.UserInfoResponse> getAllUsers() {
         return userRepository.findAll().stream()
                 .map(user -> UserDto.UserInfoResponse.builder().user(user).build())
                 .collect(Collectors.toList());
     }
 
-    // [추가] 관리자에 의한 회원 강제 탈퇴
+    // 관리자에 의한 회원 강제 탈퇴
     @Transactional
     public void deleteUserByAdmin(Long userId) {
         User user = userRepository.findById(userId)
@@ -104,7 +106,7 @@ public class UserService {
         userRepository.delete(user);
     }
 
-    // ======== 관리자용 회원 정보 수정 메서드 (추가) ========
+    // 관리자용 회원 정보 수정 메서드
     @Transactional
     public void updateUserByAdmin(Long userId, UserDto.AdminUpdateRequest request) {
         User user = userRepository.findById(userId)

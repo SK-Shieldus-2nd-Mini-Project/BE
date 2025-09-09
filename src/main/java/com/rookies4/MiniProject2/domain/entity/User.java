@@ -1,4 +1,3 @@
-// src/main/java/com/rookies4/MiniProject2/domain/entity/User.java
 package com.rookies4.MiniProject2.domain.entity;
 
 import com.rookies4.MiniProject2.domain.enums.Role;

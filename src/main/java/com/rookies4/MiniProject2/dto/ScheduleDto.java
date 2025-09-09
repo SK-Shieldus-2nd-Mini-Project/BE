@@ -12,7 +12,7 @@ import java.time.LocalDateTime;
 
 public class ScheduleDto {
 
-    // ======== 일정 생성 요청 DTO ========
+    // 일정 생성 요청 DTO
     @Getter
     @NoArgsConstructor
     public static class CreateRequest {
@@ -25,7 +25,8 @@ public class ScheduleDto {
 
         private String description;
     }
-    // ==================== [추가] 일정 수정 요청 DTO ====================
+
+    // 일정 수정 요청 DTO
     @Getter
     @NoArgsConstructor
     public static class UpdateRequest {
@@ -38,7 +39,8 @@ public class ScheduleDto {
 
         private String description;
     }
-    // ======== 일정 조회 응답 DTO ========
+
+    // 일정 조회 응답 DTO
     @Getter
     @NoArgsConstructor
     public static class ScheduleResponse {
@@ -55,6 +57,5 @@ public class ScheduleDto {
             this.description = schedule.getDescription();
         }
     }
-
 
 }

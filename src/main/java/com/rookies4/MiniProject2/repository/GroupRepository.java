@@ -3,7 +3,7 @@ package com.rookies4.MiniProject2.repository;
 import com.rookies4.MiniProject2.domain.entity.Group;
 import com.rookies4.MiniProject2.domain.enums.ApprovalStatus;
 import org.springframework.data.jpa.repository.JpaRepository;
-import org.springframework.data.jpa.repository.JpaSpecificationExecutor; // JpaSpecificationExecutor 임포트
+import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
 import java.util.List;
 
 // JpaSpecificationExecutor<Group> 인터페이스 상속 추가

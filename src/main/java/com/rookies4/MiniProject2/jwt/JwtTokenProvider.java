@@ -1,4 +1,3 @@
-// src/main/java/com/rookies4/MiniProject2/jwt/JwtTokenProvider.java
 package com.rookies4.MiniProject2.jwt;
 
 import com.rookies4.MiniProject2.dto.AuthDto;
@@ -34,12 +33,14 @@ public class JwtTokenProvider {
 
     // 유저 정보를 가지고 AccessToken을 생성하는 메서드
     public AuthDto.TokenResponse generateToken(Authentication authentication) {
+
         // 권한 가져오기
         String authorities = authentication.getAuthorities().stream()
                 .map(GrantedAuthority::getAuthority)
                 .collect(Collectors.joining(","));
 
         long now = (new Date()).getTime();
+
         // Access Token 생성 (유효시간: 60분)
         Date accessTokenExpiresIn = new Date(now + 3600000);
         String accessToken = Jwts.builder()
@@ -52,7 +53,7 @@ public class JwtTokenProvider {
         // TokenResponse DTO의 생성자에 맞게 수정
         return AuthDto.TokenResponse.builder()
                 .accessToken(accessToken)
-                .expiresIn(accessTokenExpiresIn.getTime()) // 만료 시간을 long 타입으로 전달
+                .expiresIn(accessTokenExpiresIn.getTime())
                 .build();
     }
 

@@ -1,4 +1,3 @@
-// src/main/java/com/rookies4/MiniProject2/service/CustomUserDetailsService.java
 package com.rookies4.MiniProject2.service;
 
 import com.rookies4.MiniProject2.domain.entity.User;
@@ -8,7 +7,6 @@ import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
-import java.util.Collections;
 
 @Service
 @RequiredArgsConstructor
@@ -28,7 +26,7 @@ public class CustomUserDetailsService implements UserDetailsService {
         return org.springframework.security.core.userdetails.User.builder()
                 .username(user.getUsername())
                 .password(user.getPassword())
-                .roles(user.getRole().name()) // "USER", "ADMIN"
+                .roles(user.getRole().name())
                 .build();
     }
 }

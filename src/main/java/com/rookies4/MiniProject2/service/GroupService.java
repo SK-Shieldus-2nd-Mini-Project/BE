@@ -5,7 +5,7 @@ import com.rookies4.MiniProject2.domain.enums.ApprovalStatus;
 import com.rookies4.MiniProject2.domain.enums.JoinStatus;
 import com.rookies4.MiniProject2.domain.enums.Role;
 import com.rookies4.MiniProject2.dto.GroupDto;
-import com.rookies4.MiniProject2.dto.UserDto; // UserDto 임포트
+import com.rookies4.MiniProject2.dto.UserDto;
 import com.rookies4.MiniProject2.repository.*;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.jpa.domain.Specification;
@@ -18,7 +18,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
-import lombok.extern.slf4j.Slf4j; // [추가] Slf4j import
+import lombok.extern.slf4j.Slf4j;
 
 @Slf4j
 @Service
@@ -29,10 +29,10 @@ public class GroupService {
     private final GroupRepository groupRepository;
     private final GroupMemberRepository groupMemberRepository;
     private final UserRepository userRepository;
-    private final RegionRepository regionRepository; // 추가
-    private final SportRepository sportRepository;   // 추가
+    private final RegionRepository regionRepository;
+    private final SportRepository sportRepository;
 
-    // [사용자] 모임 생성 메서드 (추가)
+    // [사용자] 모임 생성 메서드
     @Transactional
     public GroupDto.CreateResponse createGroup(GroupDto.CreateRequest request, String username) {
         User leader = userRepository.findByUsername(username)
@@ -69,7 +69,6 @@ public class GroupService {
         groupRepository.delete(group);
     }
 
-    // [수정] 메서드명 변경 및 로직 분리: getMyGroups -> findMyJoinedGroups
     public List<GroupDto.MyGroupResponse> findMyJoinedGroups(String username) {
         User user = userRepository.findByUsername(username)
                 .orElseThrow(() -> new UsernameNotFoundException("사용자를 찾을 수 없습니다."));
@@ -80,7 +79,7 @@ public class GroupService {
                 .collect(Collectors.toList());
     }
 
-    // [추가] 내가 만든 모임 + 내가 가입한 모임 목록 조회
+    // 내가 만든 모임 + 내가 가입한 모임 목록 조회
     public List<GroupDto.MyGroupResponse> getMyAllGroups(String username) {
         User user = userRepository.findByUsername(username)
                 .orElseThrow(() -> new UsernameNotFoundException("사용자를 찾을 수 없습니다."));
@@ -220,7 +219,7 @@ public class GroupService {
         groupRepository.save(group);
     }
 
-    // ==================== [추가] 모임 목록 전체 조회 (필터링 포함) ====================
+    // 모임 목록 전체 조회 (필터링 포함)
     public List<GroupDto.MyGroupResponse> getAllApprovedGroups(Integer regionId, Integer sportId) {
         // Specification을 사용하여 동적 쿼리 생성
         Specification<Group> spec = (root, query, cb) -> {
@@ -247,7 +246,7 @@ public class GroupService {
                 .collect(Collectors.toList());
     }
 
-    // ==================== [추가] 모임 정보 수정 ====================
+    // 모임 정보 수정
     @Transactional
     public void updateGroup(Long groupId, GroupDto.UpdateRequest request, String username) {
         User user = userRepository.findByUsername(username)
@@ -273,7 +272,7 @@ public class GroupService {
         group.setMaxMembers(request.getMaxMembers());
     }
 
-    // ==================== [추가] 모임 삭제 ====================
+    // 모임 삭제
     @Transactional
     public void deleteGroup(Long groupId, String username) {
         User user = userRepository.findByUsername(username)
@@ -287,10 +286,10 @@ public class GroupService {
             throw new AccessDeniedException("모임을 삭제할 권한이 없습니다.");
         }
 
-        groupRepository.delete(group); // Group 엔티티의 cascade 설정에 의해 연관된 GroupMember, Schedule도 함께 삭제됨
+        groupRepository.delete(group);
     }
 
-    // ==================== [추가] 가입 신청자 목록 조회 ====================
+    // 가입 신청자 목록 조회
     public List<UserDto.ApplicantResponse> getApplicants(Long groupId, String leaderUsername) {
         Group group = groupRepository.findById(groupId)
                 .orElseThrow(() -> new IllegalArgumentException("모임을 찾을 수 없습니다."));
@@ -310,7 +309,7 @@ public class GroupService {
                 .collect(Collectors.toList());
     }
 
-    // ==================== [추가] 모임 탈퇴 ====================
+    // 모임 탈퇴
     @Transactional
     public void leaveGroup(Long groupId, String username) {
         User user = userRepository.findByUsername(username)

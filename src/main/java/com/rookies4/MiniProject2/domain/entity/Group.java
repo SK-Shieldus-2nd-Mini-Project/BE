@@ -17,8 +17,9 @@ import java.util.List;
 @Getter
 @Setter
 @NoArgsConstructor
-@AllArgsConstructor // Builder를 위해 추가
-@Builder            // Builder 어노테이션 추가
+@AllArgsConstructor
+@Builder
+
 public class Group {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -53,18 +54,17 @@ public class Group {
     @Column(name = "created_at", nullable = false, updatable = false)
     private LocalDateTime createdAt;
 
-    @Builder.Default // 빌더 사용 시에도 기본값으로 초기화되도록 설정
+    @Builder.Default
     @OneToMany(mappedBy = "group", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<GroupMember> members = new ArrayList<>();
 
-    @Builder.Default // 빌더 사용 시에도 기본값으로 초기화되도록 설정
+    @Builder.Default
     @OneToMany(mappedBy = "group", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<Schedule> schedules = new ArrayList<>();
 
     @PrePersist
     protected void onCreate() {
         this.createdAt = LocalDateTime.now();
-        // approvalStatus가 null일 경우에만 PENDING으로 기본값 설정
         if (this.approvalStatus == null) {
             this.approvalStatus = ApprovalStatus.PENDING;
         }

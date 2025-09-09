@@ -15,6 +15,7 @@ import java.util.List;
 @RestController
 @RequestMapping("/api/groups/{groupId}/schedules")
 @RequiredArgsConstructor
+
 public class ScheduleController {
 
     private final ScheduleService scheduleService;
@@ -29,13 +30,13 @@ public class ScheduleController {
         return ResponseEntity.status(HttpStatus.CREATED).body(response);
     }
 
-    // ==================== [추가] 일정 목록 조회 API ====================
+    // 일정 목록 조회 API
     @GetMapping
     public ResponseEntity<List<ScheduleDto.ScheduleResponse>> getSchedules(@PathVariable Long groupId) {
         return ResponseEntity.ok(scheduleService.getSchedules(groupId));
     }
 
-    // ==================== [추가] 일정 수정 API ====================
+    // 일정 수정 API
     @PutMapping("/{scheduleId}")
     public ResponseEntity<Void> updateSchedule(
             @PathVariable Long groupId,
@@ -47,7 +48,7 @@ public class ScheduleController {
         return ResponseEntity.ok().build();
     }
 
-    // ==================== [추가] 일정 삭제 API ====================
+    // 일정 삭제 API
     @DeleteMapping("/{scheduleId}")
     public ResponseEntity<Void> deleteSchedule(
             @PathVariable Long groupId,

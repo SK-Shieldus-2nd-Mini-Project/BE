@@ -17,7 +17,7 @@ import java.util.stream.Collectors;
 
 public class GroupDto {
 
-    // ======== 모임 생성 요청 DTO ========
+    // 모임 생성 요청 DTO
     @Getter
     @NoArgsConstructor
     public static class CreateRequest {
@@ -37,7 +37,8 @@ public class GroupDto {
         @Max(value = 100, message = "최대 인원수는 100명 이하이어야 합니다.")
         private int maxMembers;
     }
-    // ==================== [추가] 모임 수정 요청 DTO ====================
+
+    // 모임 수정 요청 DTO
     @Getter
     @NoArgsConstructor
     public static class UpdateRequest {
@@ -51,7 +52,8 @@ public class GroupDto {
         @Max(value = 100, message = "최대 인원수는 100명 이하이어야 합니다.")
         private int maxMembers;
     }
-    // ======== 모임 생성 응답 DTO ========
+
+    // 모임 생성 응답 DTO
     @Getter
     @NoArgsConstructor
     public static class CreateResponse {
@@ -86,7 +88,7 @@ public class GroupDto {
         }
     }
 
-    // ======== 모임 상세 조회 응답 DTO (수정) ========
+    // 모임 상세 조회 응답 DTO
     @Getter
     @NoArgsConstructor
     public static class GroupDetailResponse {
@@ -97,8 +99,8 @@ public class GroupDto {
         private String sportName;
         private String description;
         private int maxMembers;
-        private long currentMembers; // int -> long 타입으로 변경 (countBy... 의 반환타입)
-        private List<ScheduleDto.ScheduleResponse> schedules; // ScheduleDto -> ScheduleDto.ScheduleResponse
+        private long currentMembers;
+        private List<ScheduleDto.ScheduleResponse> schedules;
 
         @Builder
         public GroupDetailResponse(Group group, long currentMembers) {
@@ -110,7 +112,7 @@ public class GroupDto {
             this.description = group.getDescription();
             this.maxMembers = group.getMaxMembers();
             this.currentMembers = currentMembers;
-            this.schedules = group.getSchedules().stream() // Schedule 엔티티 리스트를
+            this.schedules = group.getSchedules().stream()
                     .map(schedule -> ScheduleDto.ScheduleResponse.builder().schedule(schedule).build()) // ScheduleResponse DTO 리스트로 변환
                     .collect(Collectors.toList());
         }

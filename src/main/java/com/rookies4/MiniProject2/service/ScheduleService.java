@@ -49,7 +49,7 @@ public class ScheduleService {
         return ScheduleDto.ScheduleResponse.builder().schedule(newSchedule).build();
     }
 
-    // ==================== [추가] 특정 모임의 전체 일정 목록 조회 ====================
+    // 특정 모임의 전체 일정 목록 조회
     @Transactional(readOnly = true)
     public List<ScheduleDto.ScheduleResponse> getSchedules(Long groupId) {
         Group group = groupRepository.findById(groupId)
@@ -61,7 +61,7 @@ public class ScheduleService {
                 .collect(Collectors.toList());
     }
 
-    // ==================== [추가] 일정 수정 ====================
+    // 일정 수정
     @Transactional
     public void updateSchedule(Long groupId, Long scheduleId, ScheduleDto.UpdateRequest request, String username) {
         User user = userRepository.findByUsername(username)
@@ -84,7 +84,7 @@ public class ScheduleService {
         schedule.setDescription(request.getDescription());
     }
 
-    // ==================== [추가] 일정 삭제 ====================
+    // 일정 삭제
     @Transactional
     public void deleteSchedule(Long groupId, Long scheduleId, String username) {
         User user = userRepository.findByUsername(username)

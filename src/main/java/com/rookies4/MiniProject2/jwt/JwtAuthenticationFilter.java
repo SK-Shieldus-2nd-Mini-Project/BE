@@ -1,4 +1,3 @@
-// src/main/java/com/rookies4/MiniProject2/jwt/JwtAuthenticationFilter.java
 package com.rookies4.MiniProject2.jwt;
 
 import jakarta.servlet.FilterChain;

@@ -5,7 +5,6 @@ import jakarta.validation.constraints.Size;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
-import jakarta.validation.constraints.Size;
 import java.time.LocalDate;
 import com.rookies4.MiniProject2.domain.enums.Role;
 
@@ -18,7 +17,7 @@ public class UserDto {
         private LocalDate birthdate;
         private String profileImageUrl;
 
-        // ======== 비밀번호 필드 추가 ========
+        // 비밀번호 필드 추가
         @Size(min = 8, message = "비밀번호는 8자 이상이어야 합니다.") // 선택적으로 유효성 검사 추가
         private String password;
     }
@@ -41,7 +40,8 @@ public class UserDto {
             this.profileImageUrl = user.getProfileImageUrl();
         }
     }
-    // ======== 관리자용 회원 정보 수정 요청 DTO (추가) ========
+
+    // 관리자용 회원 정보 수정 요청 DTO
     @Getter
     @NoArgsConstructor
     public static class AdminUpdateRequest {
@@ -51,7 +51,8 @@ public class UserDto {
         private String password;
         private Role role; // 관리자가 역할을 변경할 수 있도록 필드 추가
     }
-    // ==================== [추가] 가입 신청자 정보 응답 DTO ====================
+
+    //가입 신청자 정보 응답 DTO
     @Getter
     @NoArgsConstructor
     public static class ApplicantResponse {

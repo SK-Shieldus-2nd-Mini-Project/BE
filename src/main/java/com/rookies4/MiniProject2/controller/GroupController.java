@@ -28,7 +28,7 @@ public class GroupController {
         return ResponseEntity.ok(groupService.getAllApprovedGroups(regionId, sportId));
     }
 
-    // ======== 모임 생성 API (추가) ========
+    // 모임 생성 API
     @PostMapping
     public ResponseEntity<GroupDto.CreateResponse> createGroup(
             @Valid @RequestBody GroupDto.CreateRequest request,
@@ -38,7 +38,7 @@ public class GroupController {
         return ResponseEntity.status(HttpStatus.CREATED).body(response);
     }
 
-    // ==================== 모임 정보 수정 API ====================
+    // 모임 정보 수정 API
     @PutMapping("/{groupId}")
     public ResponseEntity<Void> updateGroup(
             @PathVariable Long groupId,
@@ -48,7 +48,7 @@ public class GroupController {
         return ResponseEntity.ok().build();
     }
 
-    // ====================  모임 삭제 API ====================
+    //  모임 삭제 API
     @DeleteMapping("/{groupId}")
     public ResponseEntity<Void> deleteGroup(
             @PathVariable Long groupId,
@@ -63,7 +63,7 @@ public class GroupController {
         return ResponseEntity.ok(groupService.getGroupDetails(groupId));
     }
 
-    // ======== 모임 가입 신청 API (추가) ========
+    // 모임 가입 신청 API
     @PostMapping("/{groupId}/join")
     public ResponseEntity<Void> joinGroup(
             @PathVariable Long groupId,
@@ -73,7 +73,7 @@ public class GroupController {
         return ResponseEntity.ok().build();
     }
 
-    // ======== 모임 가입 신청 승인 API (추가) ========
+    // 모임 가입 신청 승인 API
     @PostMapping("/{groupId}/applicants/{userId}/approve")
     public ResponseEntity<Void> approveJoinRequest(
             @PathVariable Long groupId,
@@ -84,7 +84,7 @@ public class GroupController {
         return ResponseEntity.ok().build();
     }
 
-    // ======== 모임 가입 신청 거절 API (추가) ========
+    // 모임 가입 신청 거절 API
     @PostMapping("/{groupId}/applicants/{userId}/reject")
     public ResponseEntity<Void> rejectJoinRequest(
             @PathVariable Long groupId,
@@ -94,7 +94,7 @@ public class GroupController {
         return ResponseEntity.noContent().build();
     }
 
-    // ==================== [추가] 가입 신청자 목록 조회 API ====================
+    // 가입 신청자 목록 조회 API
     @GetMapping("/{groupId}/applicants")
     public ResponseEntity<List<UserDto.ApplicantResponse>> getApplicants(
             @PathVariable Long groupId,
@@ -104,7 +104,7 @@ public class GroupController {
         return ResponseEntity.ok(applicants);
     }
 
-    // ==================== [추가] 모임 탈퇴 API ====================
+    // 모임 탈퇴 API
     @DeleteMapping("/{groupId}/leave")
     public ResponseEntity<Void> leaveGroup(
             @PathVariable Long groupId,

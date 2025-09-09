@@ -15,7 +15,7 @@ import org.springframework.web.bind.annotation.RestController;
 @RequestMapping("/api/auth")
 @RequiredArgsConstructor
 public class AuthController {
-    // AuthService 주입 (final 키워드 추가)
+
     private final AuthService authService;
 
     @PostMapping("/signup")

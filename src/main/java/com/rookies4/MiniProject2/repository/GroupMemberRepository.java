@@ -14,8 +14,8 @@ public interface GroupMemberRepository extends JpaRepository<GroupMember, GroupM
     List<GroupMember> findByUserAndStatus(User user, JoinStatus status);
     // 특정 모임의 현재 인원수 조회
     long countByGroupAndStatus(Group group, JoinStatus status);
-    // ======== [추가] 특정 모임의 멤버/신청자 목록 조회 ========
+    // 특정 모임의 멤버/신청자 목록 조회
     List<GroupMember> findByGroupAndStatus(Group group, JoinStatus status);
-    // ======== User와 Group으로 GroupMember를 찾는 메서드 (추가) ========
+    // User와 Group으로 GroupMember를 찾는 메서드
     Optional<GroupMember> findByUserAndGroup(User user, Group group);
 }

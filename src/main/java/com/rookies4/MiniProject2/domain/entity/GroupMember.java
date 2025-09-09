@@ -11,8 +11,9 @@ import java.time.LocalDateTime;
 @Getter
 @Setter
 @NoArgsConstructor
-@AllArgsConstructor // Builder를 위해 추가
-@Builder            // Builder 어노테이션 추가
+@AllArgsConstructor
+@Builder
+
 public class GroupMember {
     @Id
     @ManyToOne(fetch = FetchType.LAZY)
@@ -34,7 +35,6 @@ public class GroupMember {
     @PrePersist
     protected void onApply() {
         this.appliedAt = LocalDateTime.now();
-        // status가 null일 경우에만 PENDING으로 기본값 설정
         if (this.status == null) {
             this.status = JoinStatus.PENDING;
         }

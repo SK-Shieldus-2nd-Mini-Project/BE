@@ -19,8 +19,6 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 
-
-
 @Configuration
 @EnableWebSecurity
 @EnableMethodSecurity
@@ -30,7 +28,6 @@ public class SecurityConfig {
     // AuthService, JwtTokenProvider를 의존성 주입받습니다.
     private final CustomUserDetailsService customUserDetailsService;
     private final JwtTokenProvider jwtTokenProvider;
-
 
     @Bean
     public PasswordEncoder passwordEncoder() {
@@ -42,7 +39,6 @@ public class SecurityConfig {
         return authenticationConfiguration.getAuthenticationManager();
     }
 
-    // ======== 이 부분이 핵심! ========
     @Bean
     public AuthenticationProvider authenticationProvider() {
         DaoAuthenticationProvider authProvider = new DaoAuthenticationProvider();
@@ -50,7 +46,6 @@ public class SecurityConfig {
         authProvider.setPasswordEncoder(passwordEncoder());
         return authProvider;
     }
-    // ================================
 
     @Bean
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
@@ -63,18 +58,14 @@ public class SecurityConfig {
                 .formLogin(formLogin -> formLogin.disable())
                 .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
 
-                // ======== 인증 공급자 설정 추가 ========
                 .authenticationProvider(authenticationProvider())
-                // =====================================
 
                 .authorizeHttpRequests(auth -> auth
-                        // ==================== [수정] /api/groups GET 요청 허용 ====================
                         .requestMatchers("/h2-console/**", "/api/auth/**", "/api/regions", "/api/sports", "/api/groups").permitAll()
                         .requestMatchers("/api/admin/**").hasRole("ADMIN")
                         .anyRequest().authenticated()
                 )
-            // ======== 이 부분이 핵심! ========
-            // 직접 만든 JwtAuthenticationFilter를 UsernamePasswordAuthenticationFilter 전에 실행
+
             .addFilterBefore(new JwtAuthenticationFilter(jwtTokenProvider), UsernamePasswordAuthenticationFilter.class);
         return http.build();
     }

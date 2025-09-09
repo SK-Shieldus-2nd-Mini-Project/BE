@@ -13,7 +13,7 @@ import org.springframework.security.core.Authentication;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import lombok.extern.slf4j.Slf4j; // [추가] Slf4j import
+import lombok.extern.slf4j.Slf4j;
 
 @Slf4j
 @Service
@@ -39,13 +39,13 @@ public class AuthService {
                 .nickname(request.getNickname())
                 .birthdate(request.getBirthdate())
                 .profileImageUrl(request.getProfileImageUrl())
-                .role(Role.USER) // 기본 역할은 USER
+                .role(Role.USER)
                 .build();
 
-        // [수정] save() 메서드가 반환하는 영속화된 User 객체를 받습니다.
+        // save() 메서드가 반환하는 영속화된 User 객체를 받습니다.
         User savedUser = userRepository.save(userToSave);
 
-        // [수정] id가 부여된 savedUser 객체를 사용하여 응답을 생성합니다.
+        // id가 부여된 savedUser 객체를 사용하여 응답을 생성합니다.
         return AuthDto.SignUpResponse.builder()
                 .userId(savedUser.getId())
                 .username(savedUser.getUsername())

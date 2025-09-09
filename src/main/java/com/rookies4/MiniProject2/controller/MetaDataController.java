@@ -1,4 +1,3 @@
-// sk-shieldus-2nd-mini-project/be/BE-mypage_mygroups/src/main/java/com/rookies4/MiniProject2/controller/MetaDataController.java
 package com.rookies4.MiniProject2.controller;
 
 import com.rookies4.MiniProject2.dto.RegionDto;
