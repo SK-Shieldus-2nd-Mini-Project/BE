@@ -68,7 +68,8 @@ public class SecurityConfig {
                 // =====================================
 
                 .authorizeHttpRequests(auth -> auth
-                        .requestMatchers("/h2-console/**", "/api/auth/**", "/api/regions", "/api/sports", "/groups").permitAll()
+                        // ==================== [수정] /api/groups GET 요청 허용 ====================
+                        .requestMatchers("/h2-console/**", "/api/auth/**", "/api/regions", "/api/sports", "/api/groups").permitAll()
                         .requestMatchers("/api/admin/**").hasRole("ADMIN")
                         .anyRequest().authenticated()
                 )

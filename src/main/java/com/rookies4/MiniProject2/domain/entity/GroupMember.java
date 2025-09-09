@@ -34,6 +34,9 @@ public class GroupMember {
     @PrePersist
     protected void onApply() {
         this.appliedAt = LocalDateTime.now();
-        this.status = JoinStatus.PENDING;
+        // status가 null일 경우에만 PENDING으로 기본값 설정
+        if (this.status == null) {
+            this.status = JoinStatus.PENDING;
+        }
     }
 }

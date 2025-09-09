@@ -51,4 +51,19 @@ public class UserDto {
         private String password;
         private Role role; // 관리자가 역할을 변경할 수 있도록 필드 추가
     }
+    // ==================== [추가] 가입 신청자 정보 응답 DTO ====================
+    @Getter
+    @NoArgsConstructor
+    public static class ApplicantResponse {
+        private Long userId;
+        private String nickname;
+        private String profileImageUrl;
+
+        @Builder
+        public ApplicantResponse(User user) {
+            this.userId = user.getId();
+            this.nickname = user.getNickname();
+            this.profileImageUrl = user.getProfileImageUrl();
+        }
+    }
 }

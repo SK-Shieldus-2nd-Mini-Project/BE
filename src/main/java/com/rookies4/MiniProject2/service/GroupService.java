@@ -3,14 +3,18 @@ package com.rookies4.MiniProject2.service;
 import com.rookies4.MiniProject2.domain.entity.*;
 import com.rookies4.MiniProject2.domain.enums.ApprovalStatus;
 import com.rookies4.MiniProject2.domain.enums.JoinStatus;
+import com.rookies4.MiniProject2.domain.enums.Role;
 import com.rookies4.MiniProject2.dto.GroupDto;
+import com.rookies4.MiniProject2.dto.UserDto; // UserDto 임포트
 import com.rookies4.MiniProject2.repository.*;
-import lombok.Builder;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.jpa.domain.Specification;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.security.access.AccessDeniedException;
+import jakarta.persistence.criteria.Predicate;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -179,5 +183,122 @@ public class GroupService {
                 .orElseThrow(() -> new IllegalArgumentException("모임을 찾을 수 없습니다."));
         group.setApprovalStatus(ApprovalStatus.APPROVED);
         groupRepository.save(group);
+    }
+
+    // ==================== [추가] 모임 목록 전체 조회 (필터링 포함) ====================
+    public List<GroupDto.MyGroupResponse> getAllApprovedGroups(Integer regionId, Integer sportId) {
+        // Specification을 사용하여 동적 쿼리 생성
+        Specification<Group> spec = (root, query, cb) -> {
+            List<Predicate> predicates = new ArrayList<>();
+
+            // 1. 기본 조건: 승인된(APPROVED) 모임만 조회
+            predicates.add(cb.equal(root.get("approvalStatus"), ApprovalStatus.APPROVED));
+
+            // 2. 지역 ID 필터링 조건 (파라미터가 있는 경우)
+            if (regionId != null) {
+                predicates.add(cb.equal(root.get("region").get("id"), regionId));
+            }
+
+            // 3. 종목 ID 필터링 조건 (파라미터가 있는 경우)
+            if (sportId != null) {
+                predicates.add(cb.equal(root.get("sport").get("id"), sportId));
+            }
+
+            return cb.and(predicates.toArray(new Predicate[0]));
+        };
+
+        return groupRepository.findAll(spec).stream()
+                .map(GroupDto.MyGroupResponse::new)
+                .collect(Collectors.toList());
+    }
+
+    // ==================== [추가] 모임 정보 수정 ====================
+    @Transactional
+    public void updateGroup(Long groupId, GroupDto.UpdateRequest request, String username) {
+        User user = userRepository.findByUsername(username)
+                .orElseThrow(() -> new UsernameNotFoundException("사용자를 찾을 수 없습니다."));
+
+        Group group = groupRepository.findById(groupId)
+                .orElseThrow(() -> new IllegalArgumentException("모임을 찾을 수 없습니다."));
+
+        // 권한 확인: 모임의 리더이거나 관리자(ADMIN)만 수정 가능
+        if (!group.getLeader().getId().equals(user.getId()) && user.getRole() != Role.ADMIN) {
+            throw new AccessDeniedException("모임 정보를 수정할 권한이 없습니다.");
+        }
+
+        // 현재 멤버 수보다 작게 최대 인원수를 변경할 수 없도록 방어
+        long currentMembers = groupMemberRepository.countByGroupAndStatus(group, JoinStatus.APPROVED);
+        if (request.getMaxMembers() < currentMembers) {
+            throw new IllegalArgumentException("최대 인원수는 현재 인원수(" + currentMembers + "명)보다 적게 설정할 수 없습니다.");
+        }
+
+        // 정보 업데이트
+        group.setGroupName(request.getGroupName());
+        group.setDescription(request.getDescription());
+        group.setMaxMembers(request.getMaxMembers());
+    }
+
+    // ==================== [추가] 모임 삭제 ====================
+    @Transactional
+    public void deleteGroup(Long groupId, String username) {
+        User user = userRepository.findByUsername(username)
+                .orElseThrow(() -> new UsernameNotFoundException("사용자를 찾을 수 없습니다."));
+
+        Group group = groupRepository.findById(groupId)
+                .orElseThrow(() -> new IllegalArgumentException("모임을 찾을 수 없습니다."));
+
+        // 권한 확인: 모임의 리더이거나 관리자(ADMIN)만 삭제 가능
+        if (!group.getLeader().getId().equals(user.getId()) && user.getRole() != Role.ADMIN) {
+            throw new AccessDeniedException("모임을 삭제할 권한이 없습니다.");
+        }
+
+        groupRepository.delete(group); // Group 엔티티의 cascade 설정에 의해 연관된 GroupMember, Schedule도 함께 삭제됨
+    }
+
+    // ==================== [추가] 가입 신청자 목록 조회 ====================
+    public List<UserDto.ApplicantResponse> getApplicants(Long groupId, String leaderUsername) {
+        Group group = groupRepository.findById(groupId)
+                .orElseThrow(() -> new IllegalArgumentException("모임을 찾을 수 없습니다."));
+
+        User leader = userRepository.findByUsername(leaderUsername)
+                .orElseThrow(() -> new UsernameNotFoundException("리더 정보를 찾을 수 없습니다."));
+
+        // 요청한 사용자가 실제 모임의 리더인지 확인
+        if (!group.getLeader().getId().equals(leader.getId())) {
+            throw new AccessDeniedException("모임의 리더만 신청자 목록을 조회할 수 있습니다.");
+        }
+
+        // 'PENDING' 상태인 멤버 목록을 조회하여 DTO로 변환 후 반환
+        return groupMemberRepository.findByGroupAndStatus(group, JoinStatus.PENDING)
+                .stream()
+                .map(groupMember -> UserDto.ApplicantResponse.builder().user(groupMember.getUser()).build())
+                .collect(Collectors.toList());
+    }
+
+    // ==================== [추가] 모임 탈퇴 ====================
+    @Transactional
+    public void leaveGroup(Long groupId, String username) {
+        User user = userRepository.findByUsername(username)
+                .orElseThrow(() -> new UsernameNotFoundException("사용자를 찾을 수 없습니다."));
+
+        Group group = groupRepository.findById(groupId)
+                .orElseThrow(() -> new IllegalArgumentException("모임을 찾을 수 없습니다."));
+
+        // 모임의 리더는 탈퇴할 수 없음 (모임 삭제나 리더 위임 기능이 필요)
+        if (group.getLeader().getId().equals(user.getId())) {
+            throw new IllegalStateException("모임의 리더는 탈퇴할 수 없습니다. 모임을 삭제하거나 리더를 위임해주세요.");
+        }
+
+        // 사용자의 가입 정보를 찾음
+        GroupMember groupMember = groupMemberRepository.findByUserAndGroup(user, group)
+                .orElseThrow(() -> new IllegalArgumentException("해당 모임의 멤버가 아닙니다."));
+
+        // 가입 승인(APPROVED) 상태인 멤버만 탈퇴 가능
+        if (groupMember.getStatus() != JoinStatus.APPROVED) {
+            throw new IllegalStateException("가입 승인된 멤버만 탈퇴가 가능합니다.");
+        }
+
+        // 멤버 정보 삭제
+        groupMemberRepository.delete(groupMember);
     }
 }

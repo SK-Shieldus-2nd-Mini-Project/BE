@@ -64,6 +64,9 @@ public class Group {
     @PrePersist
     protected void onCreate() {
         this.createdAt = LocalDateTime.now();
-        this.approvalStatus = ApprovalStatus.PENDING;
+        // approvalStatus가 null일 경우에만 PENDING으로 기본값 설정
+        if (this.approvalStatus == null) {
+            this.approvalStatus = ApprovalStatus.PENDING;
+        }
     }
 }

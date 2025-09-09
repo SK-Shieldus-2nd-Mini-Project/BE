@@ -25,7 +25,19 @@ public class ScheduleDto {
 
         private String description;
     }
+    // ==================== [추가] 일정 수정 요청 DTO ====================
+    @Getter
+    @NoArgsConstructor
+    public static class UpdateRequest {
+        @NotBlank(message = "모임 장소는 필수입니다.")
+        private String location;
 
+        @NotNull(message = "모임 시간은 필수입니다.")
+        @Future(message = "모임 시간은 현재 시간 이후로만 설정 가능합니다.")
+        private LocalDateTime meetingTime;
+
+        private String description;
+    }
     // ======== 일정 조회 응답 DTO ========
     @Getter
     @NoArgsConstructor
@@ -43,4 +55,6 @@ public class ScheduleDto {
             this.description = schedule.getDescription();
         }
     }
+
+
 }
