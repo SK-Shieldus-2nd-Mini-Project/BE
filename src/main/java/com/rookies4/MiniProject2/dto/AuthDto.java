@@ -1,5 +1,6 @@
 package com.rookies4.MiniProject2.dto;
 
+import com.rookies4.MiniProject2.domain.enums.Role;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import lombok.Getter;
@@ -35,12 +36,14 @@ public class AuthDto {
         private Long userId;
         private String username;
         private String nickname;
+        private Role role;
 
         @Builder
-        public SignUpResponse(Long userId, String username, String nickname) {
+        public SignUpResponse(Long userId, String username, String nickname, Role role) {
             this.userId = userId;
             this.username = username;
             this.nickname = nickname;
+            this.role = role;
         }
     }
 
