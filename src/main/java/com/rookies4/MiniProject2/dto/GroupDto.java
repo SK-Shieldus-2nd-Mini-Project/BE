@@ -42,15 +42,11 @@ public class GroupDto {
     @Getter
     @NoArgsConstructor
     public static class UpdateRequest {
-        @NotBlank(message = "모임 이름은 필수입니다.")
         private String groupName;
-
         private String description;
-
-        @NotNull(message = "최대 인원수는 필수입니다.")
-        @Min(value = 2, message = "최대 인원수는 2명 이상이어야 합니다.")
-        @Max(value = 100, message = "최대 인원수는 100명 이하이어야 합니다.")
-        private int maxMembers;
+        private Integer regionId;
+        private Integer sportId;
+        private Integer maxMembers;
     }
 
     // 모임 생성 응답 DTO

@@ -19,6 +19,7 @@ import java.util.List;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.util.StringUtils;
 
 @Slf4j
 @Service
@@ -260,16 +261,44 @@ public class GroupService {
             throw new AccessDeniedException("모임 정보를 수정할 권한이 없습니다.");
         }
 
-        // 현재 멤버 수보다 작게 최대 인원수를 변경할 수 없도록 방어
-        long currentMembers = groupMemberRepository.countByGroupAndStatus(group, JoinStatus.APPROVED);
-        if (request.getMaxMembers() < currentMembers) {
-            throw new IllegalArgumentException("최대 인원수는 현재 인원수(" + currentMembers + "명)보다 적게 설정할 수 없습니다.");
+        // groupName이 요청에 포함되었고, 비어있지 않은 경우에만 업데이트
+        if (StringUtils.hasText(request.getGroupName())) {
+            group.setGroupName(request.getGroupName());
         }
 
-        // 정보 업데이트
-        group.setGroupName(request.getGroupName());
-        group.setDescription(request.getDescription());
-        group.setMaxMembers(request.getMaxMembers());
+        // description이 요청에 포함된 경우에만 업데이트 (null 허용)
+        if (request.getDescription() != null) {
+            group.setDescription(request.getDescription());
+        }
+
+        // regionId가 요청에 포함된 경우, 해당 Region을 찾아 업데이트
+        if (request.getRegionId() != null) {
+            Region region = regionRepository.findById(request.getRegionId())
+                    .orElseThrow(() -> new IllegalArgumentException("존재하지 않는 지역입니다."));
+            group.setRegion(region);
+        }
+
+        // sportId가 요청에 포함된 경우, 해당 Sport를 찾아 업데이트
+        if (request.getSportId() != null) {
+            Sport sport = sportRepository.findById(request.getSportId())
+                    .orElseThrow(() -> new IllegalArgumentException("존재하지 않는 종목입니다."));
+            group.setSport(sport);
+        }
+
+        // maxMembers가 요청에 포함된 경우에만 업데이트
+        if (request.getMaxMembers() != null) {
+            // 최대 인원수 유효성 검사
+            int maxMembers = request.getMaxMembers();
+            if (maxMembers < 2 || maxMembers > 100) {
+                throw new IllegalArgumentException("최대 인원수는 2명 이상, 100명 이하이어야 합니다.");
+            }
+            long currentMembers = groupMemberRepository.countByGroupAndStatus(group, JoinStatus.APPROVED);
+            if (maxMembers < currentMembers) {
+                throw new IllegalArgumentException("최대 인원수는 현재 인원수(" + currentMembers + "명)보다 적게 설정할 수 없습니다.");
+            }
+            group.setMaxMembers(maxMembers);
+        }
+
     }
 
     // 모임 삭제
