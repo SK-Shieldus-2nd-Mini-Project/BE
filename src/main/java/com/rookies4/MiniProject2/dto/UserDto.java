@@ -30,6 +30,7 @@ public class UserDto {
         private String nickname;
         private LocalDate birthdate;
         private String profileImageUrl;
+        private Role role; // role 필드 추가
 
         @Builder
         public UserInfoResponse(User user) {
@@ -38,6 +39,7 @@ public class UserDto {
             this.nickname = user.getNickname();
             this.birthdate = user.getBirthdate();
             this.profileImageUrl = user.getProfileImageUrl();
+            this.role = user.getRole(); // user 객체에서 role 정보 할당
         }
     }
 
