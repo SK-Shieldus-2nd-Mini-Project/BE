@@ -77,7 +77,7 @@ public class AuthService {
                 .password(passwordEncoder.encode(request.getPassword()))
                 .nickname(request.getNickname())
                 .birthdate(request.getBirthdate())
-                .profileImageUrl(request.getProfileImageUrl())
+                .profileImageUrl(profileImageUrl)
                 .role(Role.USER)
                 .build();
 
