@@ -56,7 +56,7 @@ class AuthServiceTest {
         when(userRepository.save(any(User.class))).thenReturn(savedUser);
 
         // when (무엇을 할 때)
-        AuthDto.SignUpResponse response = authService.signup(request);
+        AuthDto.SignUpResponse response = authService.signup(request, null);
 
         // then (결과 확인)
         assertThat(response).isNotNull(); // 응답이 null이 아닌지 확인
@@ -78,7 +78,7 @@ class AuthServiceTest {
 
         // when & then
         IllegalArgumentException exception = assertThrows(IllegalArgumentException.class, () -> {
-            authService.signup(request);
+            authService.signup(request, null);
         });
         assertThat(exception.getMessage()).isEqualTo("이미 사용 중인 아이디입니다.");
     }

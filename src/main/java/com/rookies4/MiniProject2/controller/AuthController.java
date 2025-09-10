@@ -6,10 +6,8 @@ import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 
 @RestController
 @RequestMapping("/api/auth")
@@ -19,8 +17,11 @@ public class AuthController {
     private final AuthService authService;
 
     @PostMapping("/signup")
-    public ResponseEntity<AuthDto.SignUpResponse> signup(@Valid @RequestBody AuthDto.SignUpRequest request) {
-        AuthDto.SignUpResponse response = authService.signup(request);
+    public ResponseEntity<AuthDto.SignUpResponse> signup(
+            @Valid @RequestPart("signupRequest") AuthDto.SignUpRequest request,
+            @RequestPart(value = "file", required = false) MultipartFile file) {
+
+        AuthDto.SignUpResponse response = authService.signup(request, file);
         return ResponseEntity.status(HttpStatus.CREATED).body(response);
     }
 

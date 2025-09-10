@@ -15,6 +15,7 @@ import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.context.annotation.Import;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.time.LocalDate;
 
@@ -63,8 +64,7 @@ class AuthControllerTest {
                 .username("testuser")
                 .nickname("testnick")
                 .build();
-        given(authService.signup(any(AuthDto.SignUpRequest.class))).willReturn(response);
-
+given(authService.signup(any(AuthDto.SignUpRequest.class), any(MultipartFile.class))).willReturn(response);
         // when & then
         mockMvc.perform(post("/api/auth/signup")
                         .contentType(MediaType.APPLICATION_JSON)
