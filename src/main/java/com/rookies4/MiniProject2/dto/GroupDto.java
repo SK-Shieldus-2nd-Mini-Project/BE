@@ -75,7 +75,7 @@ public class GroupDto {
         private String description;
         private String regionName;
         private String sportName;
-        private boolean isLeader;
+        private boolean leader;
 
         @Builder
         public MyGroupResponse(Group group, User currentUser) {
@@ -84,7 +84,7 @@ public class GroupDto {
             this.description = group.getDescription();
             this.regionName = group.getRegion().getRegionName();
             this.sportName = group.getSport().getSportName();
-            this.isLeader = group.getLeader().getId().equals(currentUser.getId());
+            this.leader = group.getLeader().getId().equals(currentUser.getId());
         }
 
         public MyGroupResponse(Group group) {
@@ -93,7 +93,7 @@ public class GroupDto {
         this.description = group.getDescription();
         this.regionName = group.getRegion().getRegionName();
         this.sportName = group.getSport().getSportName();
-        this.isLeader = false; // 현재 사용자를 알 수 없으므로 기본값 false
+        this.leader = false; // 현재 사용자를 알 수 없으므로 기본값 false
     }
     }
 
