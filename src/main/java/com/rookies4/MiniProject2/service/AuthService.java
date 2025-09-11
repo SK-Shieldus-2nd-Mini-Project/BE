@@ -117,4 +117,33 @@ public class AuthService {
 
         return tokenResponse;
     }
+
+    @Transactional
+    public AuthDto.TokenResponse reissue(AuthDto.ReissueRequest request) {
+        // 1. Refresh Token 검증
+        if (!jwtTokenProvider.validateToken(request.getRefreshToken())) {
+            throw new IllegalArgumentException("유효하지 않은 Refresh Token 입니다.");
+        }
+
+        // 2. Access Token에서 사용자 정보 (username) 가져오기 (만료된 토큰이어도 가능)
+        Authentication authentication = jwtTokenProvider.getAuthentication(request.getAccessToken());
+
+        // 3. DB에서 사용자 username 기반으로 저장된 Refresh Token 값 가져오기
+        RefreshToken refreshToken = refreshTokenRepository.findByUsername(authentication.getName())
+                .orElseThrow(() -> new IllegalArgumentException("로그아웃된 사용자입니다."));
+
+        // 4. 요청으로 들어온 Refresh Token과 DB에 저장된 Refresh Token 값이 일치하는지 검사
+        if (!refreshToken.getTokenValue().equals(request.getRefreshToken())) {
+            throw new IllegalArgumentException("토큰 정보가 일치하지 않습니다.");
+        }
+
+        // 5. 새로운 토큰 생성
+        AuthDto.TokenResponse newTokenResponse = jwtTokenProvider.generateTokens(authentication);
+
+        // 6. DB의 Refresh Token 정보 업데이트
+        refreshToken.updateToken(newTokenResponse.getRefreshToken());
+
+        // 7. 토큰 발급
+        return newTokenResponse;
+    }
 }
