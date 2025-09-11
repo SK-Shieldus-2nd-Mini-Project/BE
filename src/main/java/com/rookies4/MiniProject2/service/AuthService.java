@@ -7,6 +7,7 @@ import com.rookies4.MiniProject2.domain.enums.Role;
 import com.rookies4.MiniProject2.dto.AuthDto;
 import com.rookies4.MiniProject2.exception.CustomException;
 import com.rookies4.MiniProject2.exception.ErrorCode;
+import com.rookies4.MiniProject2.exception.BusinessLogicException;
 import com.rookies4.MiniProject2.jwt.JwtTokenProvider;
 import com.rookies4.MiniProject2.repository.RefreshTokenRepository;
 import com.rookies4.MiniProject2.repository.UserRepository;
@@ -43,10 +44,10 @@ public class AuthService {
     @Transactional
     public AuthDto.SignUpResponse signup(AuthDto.SignUpRequest request, MultipartFile file) {
         if (userRepository.existsByUsername(request.getUsername())) {
-            throw new IllegalArgumentException("이미 사용 중인 아이디입니다.");
+            throw new BusinessLogicException(ErrorCode.USERNAME_DUPLICATION);
         }
         if (userRepository.existsByNickname(request.getNickname())) {
-            throw new IllegalArgumentException("이미 사용 중인 닉네임입니다.");
+            throw new BusinessLogicException(ErrorCode.NICKNAME_DUPLICATION);
         }
 
         String profileImageUrl = null;

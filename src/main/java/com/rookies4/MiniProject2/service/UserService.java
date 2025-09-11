@@ -3,6 +3,9 @@ package com.rookies4.MiniProject2.service;
 import com.rookies4.MiniProject2.domain.entity.Group;
 import com.rookies4.MiniProject2.domain.entity.User;
 import com.rookies4.MiniProject2.dto.UserDto;
+import com.rookies4.MiniProject2.exception.BusinessLogicException;
+import com.rookies4.MiniProject2.exception.EntityNotFoundException;
+import com.rookies4.MiniProject2.exception.ErrorCode;
 import com.rookies4.MiniProject2.repository.GroupRepository;
 import com.rookies4.MiniProject2.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
@@ -29,7 +32,7 @@ public class UserService {
     // 내 정보 조회
     public UserDto.UserInfoResponse getMyInfo(String username) {
         User user = userRepository.findByUsername(username)
-                .orElseThrow(() -> new UsernameNotFoundException("사용자를 찾을 수 없습니다."));
+                .orElseThrow(() -> new EntityNotFoundException(ErrorCode.USER_NOT_FOUND));
         return UserDto.UserInfoResponse.builder().user(user).build();
     }
 
@@ -40,12 +43,12 @@ public class UserService {
     @Transactional
     public void updateMyInfo(String username, UserDto.UpdateRequest request) {
         User user = userRepository.findByUsername(username)
-                .orElseThrow(() -> new UsernameNotFoundException("사용자를 찾을 수 없습니다."));
+                .orElseThrow(() -> new EntityNotFoundException(ErrorCode.USER_NOT_FOUND));
 
         // 1. 닉네임 변경 요청이 있고, 기존 닉네임과 다른 경우에만 중복 검사
         if (StringUtils.hasText(request.getNickname()) && !user.getNickname().equals(request.getNickname())) {
             if (userRepository.existsByNickname(request.getNickname())) {
-                throw new IllegalArgumentException("이미 사용 중인 닉네임입니다.");
+                throw new BusinessLogicException(ErrorCode.NICKNAME_DUPLICATION);
             }
             user.setNickname(request.getNickname());
         }
@@ -71,7 +74,7 @@ public class UserService {
     @Transactional
     public void deleteUser(String username) {
         User user = userRepository.findByUsername(username)
-                .orElseThrow(() -> new UsernameNotFoundException("사용자를 찾을 수 없습니다."));
+                .orElseThrow(() -> new EntityNotFoundException(ErrorCode.USER_NOT_FOUND));
 
         // 사용자가 팀장으로 있는 모임이 있는지 확인하고, 있다면 모두 삭제 (모임 해산)
         List<Group> leadingGroups = user.getLeadingGroups();
@@ -115,7 +118,7 @@ public class UserService {
         // 닉네임 변경 및 중복 검사
         if (StringUtils.hasText(request.getNickname()) && !user.getNickname().equals(request.getNickname())) {
             if (userRepository.existsByNickname(request.getNickname())) {
-                throw new IllegalArgumentException("이미 사용 중인 닉네임입니다.");
+                throw new BusinessLogicException(ErrorCode.NICKNAME_DUPLICATION);
             }
             user.setNickname(request.getNickname());
         }

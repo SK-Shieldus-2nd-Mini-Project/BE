@@ -1,7 +1,9 @@
 package com.rookies4.MiniProject2.dto;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
 import com.rookies4.MiniProject2.domain.entity.Group;
 import com.rookies4.MiniProject2.domain.entity.Schedule;
+import com.rookies4.MiniProject2.domain.entity.User;
 import com.rookies4.MiniProject2.domain.enums.ApprovalStatus;
 import com.rookies4.MiniProject2.dto.ScheduleDto;
 import jakarta.validation.constraints.Max;
@@ -73,15 +75,26 @@ public class GroupDto {
         private String description;
         private String regionName;
         private String sportName;
+        private boolean leader;
 
         @Builder
-        public MyGroupResponse(Group group) {
+        public MyGroupResponse(Group group, User currentUser) {
             this.groupId = group.getId();
             this.groupName = group.getGroupName();
             this.description = group.getDescription();
             this.regionName = group.getRegion().getRegionName();
             this.sportName = group.getSport().getSportName();
+            this.leader = group.getLeader().getId().equals(currentUser.getId());
         }
+
+        public MyGroupResponse(Group group) {
+        this.groupId = group.getId();
+        this.groupName = group.getGroupName();
+        this.description = group.getDescription();
+        this.regionName = group.getRegion().getRegionName();
+        this.sportName = group.getSport().getSportName();
+        this.leader = false; // 현재 사용자를 알 수 없으므로 기본값 false
+    }
     }
 
     // 모임 상세 조회 응답 DTO
