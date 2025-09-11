@@ -45,4 +45,9 @@ public class UserController {
     public ResponseEntity<List<GroupDto.MyGroupResponse>> getMyAllGroups(@AuthenticationPrincipal UserDetails userDetails) {
         return ResponseEntity.ok(groupService.getMyAllGroups(userDetails.getUsername()));
     }
+
+    @GetMapping("/me/applications")
+    public ResponseEntity<List<GroupDto.ApplicationStatusResponse>> getMyApplications(@AuthenticationPrincipal UserDetails userDetails) {
+        return ResponseEntity.ok(groupService.getMyApplicationStatus(userDetails.getUsername()));
+    }
 }

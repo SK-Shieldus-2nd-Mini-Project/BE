@@ -19,6 +19,7 @@ import org.springframework.security.access.AccessDeniedException;
 import jakarta.persistence.criteria.Predicate;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Set;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 import lombok.extern.slf4j.Slf4j;
@@ -372,5 +373,35 @@ public class GroupService {
 
         // 멤버 정보 삭제
         groupMemberRepository.delete(groupMember);
+    }
+    @Transactional(readOnly = true)
+    public List<GroupDto.ApplicationStatusResponse> getMyApplicationStatus(String username) {
+        User user = userRepository.findByUsername(username)
+                .orElseThrow(() -> new EntityNotFoundException(ErrorCode.USER_NOT_FOUND));
+
+        List<GroupDto.ApplicationStatusResponse> allActivities = new ArrayList<>();
+
+        for (Group group : user.getLeadingGroups()) {
+            allActivities.add(GroupDto.ApplicationStatusResponse.builder()
+                    .groupId(group.getId())
+                    .groupName(group.getGroupName())
+                    .status(null) // 모임장은 별도 상태 없음
+                    .appliedAt(group.getCreatedAt())
+                    .leader(true)
+                    .build());
+        }
+
+        for (GroupMember membership : user.getGroupMembers()) {
+            Group group = membership.getGroup(); // 여기서 Group 엔티티를 직접 참조
+            allActivities.add(GroupDto.ApplicationStatusResponse.builder()
+                    .groupId(group.getId())
+                    .groupName(group.getGroupName())
+                    .status(membership.getStatus())
+                    .appliedAt(membership.getAppliedAt())
+                    .leader(false) // 이 경우는 신청자이므로 false
+                    .build());
+        }
+
+        return allActivities;
     }
 }

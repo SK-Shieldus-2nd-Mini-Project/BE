@@ -1,8 +1,10 @@
 package com.rookies4.MiniProject2.dto;
 
 import com.rookies4.MiniProject2.domain.entity.Group;
+import com.rookies4.MiniProject2.domain.entity.GroupMember;
 import com.rookies4.MiniProject2.domain.entity.User;
 import com.rookies4.MiniProject2.domain.enums.ApprovalStatus;
+import com.rookies4.MiniProject2.domain.enums.JoinStatus;
 import jakarta.validation.constraints.Max;
 import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.NotBlank;
@@ -11,10 +13,30 @@ import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.stream.Collectors;
 
 public class GroupDto {
+
+    @Getter
+    @NoArgsConstructor
+    public static class ApplicationStatusResponse {
+        private Long groupId;
+        private String groupName;
+        private JoinStatus status; // null if leader
+        private LocalDateTime appliedAt;
+        private boolean leader;
+
+        @Builder
+        public ApplicationStatusResponse(Long groupId, String groupName, JoinStatus status, LocalDateTime appliedAt, boolean leader) {
+            this.groupId = groupId;
+            this.groupName = groupName;
+            this.status = status;
+            this.appliedAt = appliedAt;
+            this.leader = leader;
+        }
+    }
 
     // 모임 생성 요청 DTO
     @Getter
