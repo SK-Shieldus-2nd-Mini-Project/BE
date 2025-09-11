@@ -1,10 +1,12 @@
 // src/main/java/com/rookies4/MiniProject2/service/AuthService.java
 package com.rookies4.MiniProject2.service;
 
+import com.rookies4.MiniProject2.domain.entity.RefreshToken;
 import com.rookies4.MiniProject2.domain.entity.User;
 import com.rookies4.MiniProject2.domain.enums.Role;
 import com.rookies4.MiniProject2.dto.AuthDto;
 import com.rookies4.MiniProject2.jwt.JwtTokenProvider;
+import com.rookies4.MiniProject2.repository.RefreshTokenRepository;
 import com.rookies4.MiniProject2.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -17,19 +19,18 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
-import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.UUID;
-import lombok.extern.slf4j.Slf4j;
 
 @Slf4j
 @Service
 @RequiredArgsConstructor
 public class AuthService {
     private final UserRepository userRepository;
+    private final RefreshTokenRepository refreshTokenRepository;
     private final PasswordEncoder passwordEncoder;
     private final AuthenticationManagerBuilder authenticationManagerBuilder;
     private final JwtTokenProvider jwtTokenProvider;
@@ -37,7 +38,7 @@ public class AuthService {
     @Value("${file.upload-dir}")
     private String uploadDir;
 
-     @Transactional
+    @Transactional
     public AuthDto.SignUpResponse signup(AuthDto.SignUpRequest request, MultipartFile file) {
         if (userRepository.existsByUsername(request.getUsername())) {
             throw new IllegalArgumentException("이미 사용 중인 아이디입니다.");
@@ -100,7 +101,19 @@ public class AuthService {
         Authentication authentication = authenticationManagerBuilder.getObject().authenticate(authenticationToken);
 
         // 3. 인증 정보를 기반으로 JWT 토큰 생성
-        AuthDto.TokenResponse tokenResponse = jwtTokenProvider.generateToken(authentication);
+        AuthDto.TokenResponse tokenResponse = jwtTokenProvider.generateTokens(authentication);
+
+        // 4. Refresh Token을 DB에 저장 (또는 업데이트)
+        RefreshToken refreshToken = RefreshToken.builder()
+                .username(authentication.getName())
+                .tokenValue(tokenResponse.getRefreshToken())
+                .build();
+
+        refreshTokenRepository.findByUsername(authentication.getName())
+                .ifPresentOrElse(
+                        existingToken -> existingToken.updateToken(refreshToken.getTokenValue()),
+                        () -> refreshTokenRepository.save(refreshToken)
+                );
 
         return tokenResponse;
     }
