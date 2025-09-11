@@ -51,7 +51,7 @@ public class AuthDto {
     public static class TokenResponse {
         private String grantType = "Bearer";
         private String accessToken;
-ㅁ        private String refreshToken;
+        private String refreshToken;
         private long expiresIn;
 
         @Builder
@@ -60,5 +60,13 @@ public class AuthDto {
             this.refreshToken = refreshToken;
             this.expiresIn = expiresIn;
         }
+    }
+
+    // Token 재발급 요청을 위한 DTO
+    @Getter
+    @NoArgsConstructor
+    public static class ReissueRequest {
+        private String accessToken;
+        private String refreshToken;
     }
 }
