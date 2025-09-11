@@ -31,9 +31,8 @@ public class JwtTokenProvider {
         this.key = Keys.hmacShaKeyFor(keyBytes);
     }
 
-    // 유저 정보를 가지고 AccessToken을 생성하는 메서드
-    public AuthDto.TokenResponse generateToken(Authentication authentication) {
-
+    // 유저 정보를 가지고 AccessToken, RefreshToken을 함께 생성
+    public AuthDto.TokenResponse generateTokens(Authentication authentication) {
         // 권한 가져오기
         String authorities = authentication.getAuthorities().stream()
                 .map(GrantedAuthority::getAuthority)
@@ -50,9 +49,17 @@ public class JwtTokenProvider {
                 .signWith(key, SignatureAlgorithm.HS256)
                 .compact();
 
+        // Refresh Token 생성 (유효시간: 7일)
+        Date refreshTokenExpiresIn = new Date(now + REFRESH_TOKEN_EXPIRE_TIME);
+        String refreshToken = Jwts.builder()
+                .expiration(refreshTokenExpiresIn)
+                .signWith(key)
+                .compact();
+
         // TokenResponse DTO의 생성자에 맞게 수정
         return AuthDto.TokenResponse.builder()
                 .accessToken(accessToken)
+                .refreshToken(refreshToken)
                 .expiresIn(accessTokenExpiresIn.getTime())
                 .build();
     }
