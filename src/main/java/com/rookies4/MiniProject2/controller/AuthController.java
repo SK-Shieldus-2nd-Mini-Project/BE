@@ -30,4 +30,10 @@ public class AuthController {
         AuthDto.TokenResponse token = authService.login(request);
         return ResponseEntity.ok(token);
     }
+
+    @PostMapping("/reissue")
+    public ResponseEntity<AuthDto.TokenResponse> reissue(@Valid @RequestBody AuthDto.ReissueRequest request) {
+        AuthDto.TokenResponse reissuedToken = authService.reissue(request);
+        return ResponseEntity.ok(reissuedToken);
+    }
 }
