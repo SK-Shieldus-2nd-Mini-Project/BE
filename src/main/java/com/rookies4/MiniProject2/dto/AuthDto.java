@@ -51,11 +51,13 @@ public class AuthDto {
     public static class TokenResponse {
         private String grantType = "Bearer";
         private String accessToken;
+ㅁ        private String refreshToken;
         private long expiresIn;
 
         @Builder
-        public TokenResponse(String accessToken, long expiresIn) {
+        public TokenResponse(String accessToken, String refreshToken, long expiresIn) {
             this.accessToken = accessToken;
+            this.refreshToken = refreshToken;
             this.expiresIn = expiresIn;
         }
     }
