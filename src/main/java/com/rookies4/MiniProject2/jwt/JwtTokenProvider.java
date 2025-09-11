@@ -3,9 +3,9 @@ package com.rookies4.MiniProject2.jwt;
 import com.rookies4.MiniProject2.dto.AuthDto;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;
-import io.jsonwebtoken.SignatureAlgorithm;
 import io.jsonwebtoken.io.Decoders;
 import io.jsonwebtoken.security.Keys;
+import javax.crypto.SecretKey;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
@@ -24,9 +24,10 @@ import java.util.stream.Collectors;
 @Component
 public class JwtTokenProvider {
 
-    private final Key key;
     private static final long ACCESS_TOKEN_EXPIRE_TIME = 1000 * 60 * 30L; // 30분
     private static final long REFRESH_TOKEN_EXPIRE_TIME = 1000 * 60 * 60L * 24 * 7; // 7일
+
+    private final SecretKey key;
 
     public JwtTokenProvider(@Value("${jwt.secret}") String secretKey) {
         byte[] keyBytes = Decoders.BASE64.decode(secretKey);
@@ -45,10 +46,10 @@ public class JwtTokenProvider {
         // Access Token 생성 (유효시간: 30분)
         Date accessTokenExpiresIn = new Date(now + ACCESS_TOKEN_EXPIRE_TIME);
         String accessToken = Jwts.builder()
-                .setSubject(authentication.getName())
+                .subject(authentication.getName())
                 .claim("auth", authorities)
-                .setExpiration(accessTokenExpiresIn)
-                .signWith(key, SignatureAlgorithm.HS256)
+                .expiration(accessTokenExpiresIn)
+                .signWith(key)
                 .compact();
 
         // Refresh Token 생성 (유효시간: 7일)
@@ -88,7 +89,7 @@ public class JwtTokenProvider {
     // 토큰 유효성 검증 메서드
     public boolean validateToken(String token) {
         try {
-            Jwts.parser().setSigningKey(key).build().parseClaimsJws(token);
+            Jwts.parser().verifyWith(key).build().parseSignedClaims(token);
             return true;
         } catch (io.jsonwebtoken.security.SecurityException | io.jsonwebtoken.MalformedJwtException e) {
             // log.info("Invalid JWT Token", e);
@@ -104,7 +105,7 @@ public class JwtTokenProvider {
 
     private Claims parseClaims(String accessToken) {
         try {
-            return Jwts.parser().setSigningKey(key).build().parseClaimsJws(accessToken).getBody();
+            return Jwts.parser().verifyWith(key).build().parseSignedClaims(accessToken).getPayload();
         } catch (io.jsonwebtoken.ExpiredJwtException e) {
             return e.getClaims();
         }
