@@ -1,12 +1,13 @@
 package com.rookies4.MiniProject2.dto;
 
 import com.rookies4.MiniProject2.domain.entity.User;
+import com.rookies4.MiniProject2.domain.enums.Role;
 import jakarta.validation.constraints.Size;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+
 import java.time.LocalDate;
-import com.rookies4.MiniProject2.domain.enums.Role;
 
 public class UserDto {
 
@@ -31,6 +32,7 @@ public class UserDto {
         private LocalDate birthdate;
         private String profileImageUrl;
         private Role role; // role 필드 추가
+        private boolean hasCreatedGroup;
 
         @Builder
         public UserInfoResponse(User user) {
@@ -40,6 +42,7 @@ public class UserDto {
             this.birthdate = user.getBirthdate();
             this.profileImageUrl = user.getProfileImageUrl();
             this.role = user.getRole(); // user 객체에서 role 정보 할당
+            this.hasCreatedGroup = user.getLeadingGroups() != null && !user.getLeadingGroups().isEmpty();
         }
     }
 

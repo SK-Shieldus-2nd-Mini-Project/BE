@@ -57,6 +57,8 @@ public class GroupService {
                 .maxMembers(request.getMaxMembers())
                 .build();
 
+        leader.getLeadingGroups().add(newGroup);
+
         groupRepository.save(newGroup);
 
         return GroupDto.CreateResponse.builder().group(newGroup).build();

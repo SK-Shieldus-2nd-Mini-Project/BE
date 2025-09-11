@@ -1,11 +1,8 @@
 package com.rookies4.MiniProject2.dto;
 
-import com.fasterxml.jackson.annotation.JsonProperty;
 import com.rookies4.MiniProject2.domain.entity.Group;
-import com.rookies4.MiniProject2.domain.entity.Schedule;
 import com.rookies4.MiniProject2.domain.entity.User;
 import com.rookies4.MiniProject2.domain.enums.ApprovalStatus;
-import com.rookies4.MiniProject2.dto.ScheduleDto;
 import jakarta.validation.constraints.Max;
 import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.NotBlank;
@@ -13,7 +10,7 @@ import jakarta.validation.constraints.NotNull;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
-import java.time.LocalDateTime;
+
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -76,6 +73,7 @@ public class GroupDto {
         private String regionName;
         private String sportName;
         private boolean leader;
+        private ApprovalStatus approvalStatus;
 
         @Builder
         public MyGroupResponse(Group group, User currentUser) {
@@ -85,16 +83,18 @@ public class GroupDto {
             this.regionName = group.getRegion().getRegionName();
             this.sportName = group.getSport().getSportName();
             this.leader = group.getLeader().getId().equals(currentUser.getId());
+            this.approvalStatus = group.getApprovalStatus();
         }
 
         public MyGroupResponse(Group group) {
-        this.groupId = group.getId();
-        this.groupName = group.getGroupName();
-        this.description = group.getDescription();
-        this.regionName = group.getRegion().getRegionName();
-        this.sportName = group.getSport().getSportName();
-        this.leader = false; // 현재 사용자를 알 수 없으므로 기본값 false
-    }
+            this.groupId = group.getId();
+            this.groupName = group.getGroupName();
+            this.description = group.getDescription();
+            this.regionName = group.getRegion().getRegionName();
+            this.sportName = group.getSport().getSportName();
+            this.leader = false; // 현재 사용자를 알 수 없으므로 기본값 false
+            this.approvalStatus = group.getApprovalStatus();
+        }
     }
 
     // 모임 상세 조회 응답 DTO
