@@ -5,6 +5,8 @@ import com.rookies4.MiniProject2.domain.entity.RefreshToken;
 import com.rookies4.MiniProject2.domain.entity.User;
 import com.rookies4.MiniProject2.domain.enums.Role;
 import com.rookies4.MiniProject2.dto.AuthDto;
+import com.rookies4.MiniProject2.exception.CustomException;
+import com.rookies4.MiniProject2.exception.ErrorCode;
 import com.rookies4.MiniProject2.jwt.JwtTokenProvider;
 import com.rookies4.MiniProject2.repository.RefreshTokenRepository;
 import com.rookies4.MiniProject2.repository.UserRepository;
@@ -120,21 +122,21 @@ public class AuthService {
 
     @Transactional
     public AuthDto.TokenResponse reissue(AuthDto.ReissueRequest request) {
-        // 1. Refresh Token 검증
+        // 1. Refresh Token 유효성 검증
         if (!jwtTokenProvider.validateToken(request.getRefreshToken())) {
-            throw new IllegalArgumentException("유효하지 않은 Refresh Token 입니다.");
+            throw new CustomException(ErrorCode.INVALID_TOKEN);
         }
 
-        // 2. Access Token에서 사용자 정보 (username) 가져오기 (만료된 토큰이어도 가능)
+        // 2. Access Token 에서 사용자 정보 (username) 가져오기 (만료된 토큰이어도 가능)
         Authentication authentication = jwtTokenProvider.getAuthentication(request.getAccessToken());
 
-        // 3. DB에서 사용자 username 기반으로 저장된 Refresh Token 값 가져오기
+        // 3. DB 에서 사용자 username 기반으로 저장된 Refresh Token 값 가져오기
         RefreshToken refreshToken = refreshTokenRepository.findByUsername(authentication.getName())
-                .orElseThrow(() -> new IllegalArgumentException("로그아웃된 사용자입니다."));
+                .orElseThrow(() -> new CustomException(ErrorCode.TOKEN_NOT_FOUND));
 
-        // 4. 요청으로 들어온 Refresh Token과 DB에 저장된 Refresh Token 값이 일치하는지 검사
+        // 4. 요청으로 들어온 Refresh Token 과 DB에 저장된 Refresh Token 값이 일치하는지 검사
         if (!refreshToken.getTokenValue().equals(request.getRefreshToken())) {
-            throw new IllegalArgumentException("토큰 정보가 일치하지 않습니다.");
+            throw new CustomException(ErrorCode.INVALID_TOKEN);
         }
 
         // 5. 새로운 토큰 생성
