@@ -88,13 +88,16 @@ public class GroupService {
 
     // 내가 만든 모임 + 내가 가입한 모임 목록 조회
     public List<GroupDto.MyGroupResponse> getMyAllGroups(String username) {
-        User user = userRepository.findByUsername(username)
+        // ==================== [수정] 페치 조인으로 User와 leadingGroups 함께 조회 ====================
+        User user = userRepository.findByUsernameWithLeadingGroups(username)
                 .orElseThrow(() -> new EntityNotFoundException(ErrorCode.USER_NOT_FOUND));
 
-        List<Group> joinedGroups = groupMemberRepository.findByUserAndStatus(user, JoinStatus.APPROVED)
+        // ==================== [수정] 페치 조인으로 GroupMember와 Group 함께 조회 ====================
+        List<Group> joinedGroups = groupMemberRepository.findByUserAndStatusWithGroup(user, JoinStatus.APPROVED)
                 .stream()
                 .map(GroupMember::getGroup)
                 .toList();
+
 
         List<Group> leadingGroups = user.getLeadingGroups();
 
@@ -110,7 +113,8 @@ public class GroupService {
         User user = userRepository.findByUsername(username)
                 .orElseThrow(() -> new EntityNotFoundException(ErrorCode.USER_NOT_FOUND));
 
-        return groupMemberRepository.findByUserAndStatus(user, JoinStatus.APPROVED)
+        // ==================== [수정] 페치 조인으로 GroupMember와 Group 함께 조회 ====================
+        return groupMemberRepository.findByUserAndStatusWithGroup(user, JoinStatus.APPROVED)
                 .stream()
                 .map(groupMember -> new GroupDto.MyGroupResponse(groupMember.getGroup()))
                 .collect(Collectors.toList());
@@ -118,7 +122,8 @@ public class GroupService {
 
     // [사용자] 모임 상세 정보 조회
     public GroupDto.GroupDetailResponse getGroupDetails(Long groupId) {
-        Group group = groupRepository.findById(groupId)
+        // ==================== [수정] 페치 조인으로 Group과 연관 엔티티 함께 조회 ====================
+        Group group = groupRepository.findByIdWithDetails(groupId)
                 .orElseThrow(() -> new EntityNotFoundException(ErrorCode.GROUP_NOT_FOUND));
         long currentMembers = groupMemberRepository.countByGroupAndStatus(group, JoinStatus.APPROVED);
         return GroupDto.GroupDetailResponse.builder()
@@ -234,6 +239,16 @@ public class GroupService {
     public List<GroupDto.MyGroupResponse> getAllApprovedGroups(Integer regionId, Integer sportId) {
         // Specification을 사용하여 동적 쿼리 생성
         Specification<Group> spec = (root, query, cb) -> {
+            // ==================== [수정] N+1 문제 해결을 위한 페치 조인 적용 ====================
+            // 중복 조회를 방지하기 위해 query.getResultType()이 Group 클래스인 경우에만 페치 조인을 적용합니다.
+            if (query.getResultType() != Long.class && query.getResultType() != long.class) {
+                root.fetch("region");
+                root.fetch("sport");
+                root.fetch("leader");
+            }
+            // ==============================================================================
+
+
             List<Predicate> predicates = new ArrayList<>();
 
             // 1. 기본 조건: 승인된(APPROVED) 모임만 조회

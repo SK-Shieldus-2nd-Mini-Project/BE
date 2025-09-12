@@ -36,10 +36,7 @@ public class UserService {
         return UserDto.UserInfoResponse.builder().user(user).build();
     }
 
-    /**
-     * 내 정보 수정 (닉네임 중복 검사 포함)
-     */
-
+    //내 정보 수정 (닉네임 중복 검사 포함)
     @Transactional
     public void updateMyInfo(String username, UserDto.UpdateRequest request) {
         User user = userRepository.findByUsername(username)
@@ -73,7 +70,8 @@ public class UserService {
     // 회원 탈퇴
     @Transactional
     public void deleteUser(String username) {
-        User user = userRepository.findByUsername(username)
+        // ==================== [수정] 페치 조인으로 User와 leadingGroups 함께 조회 ====================
+        User user = userRepository.findByUsernameWithLeadingGroups(username)
                 .orElseThrow(() -> new EntityNotFoundException(ErrorCode.USER_NOT_FOUND));
 
         // 사용자가 팀장으로 있는 모임이 있는지 확인하고, 있다면 모두 삭제 (모임 해산)
@@ -98,7 +96,8 @@ public class UserService {
     // 관리자에 의한 회원 강제 탈퇴
     @Transactional
     public void deleteUserByAdmin(Long userId) {
-        User user = userRepository.findById(userId)
+        // ==================== [수정] 페치 조인으로 User와 leadingGroups 함께 조회 ====================
+        User user = userRepository.findByIdWithLeadingGroups(userId)
                 .orElseThrow(() -> new UsernameNotFoundException("ID " + userId + "에 해당하는 사용자를 찾을 수 없습니다."));
 
         // 기존 deleteUser 로직과 동일하게 팀장으로 있는 모임 처리
