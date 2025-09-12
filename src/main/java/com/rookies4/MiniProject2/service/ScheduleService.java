@@ -82,20 +82,9 @@ public class ScheduleService {
             throw new AccessDeniedException("일정을 수정할 권한이 없습니다. (팀장만 가능)");
         }
 
-        // location 값이 요청에 포함되었고, 비어있지 않은 경우에만 업데이트
-        if (StringUtils.hasText(request.getLocation())) {
-            schedule.setLocation(request.getLocation());
-        }
-
-        // meetingTime 값이 요청에 포함된 경우에만 업데이트
-        if (request.getMeetingTime() != null) {
-            schedule.setMeetingTime(request.getMeetingTime());
-        }
-
-        // description 값이 요청에 포함된 경우에만 업데이트 (null 허용)
-        if (request.getDescription() != null) {
-            schedule.setDescription(request.getDescription());
-        }
+        schedule.setLocation(request.getLocation());
+        schedule.setMeetingTime(request.getMeetingTime());
+        schedule.setDescription(request.getDescription());
     }
 
     // 일정 삭제
