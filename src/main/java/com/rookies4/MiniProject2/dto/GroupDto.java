@@ -12,6 +12,7 @@ import jakarta.validation.constraints.NotNull;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.time.LocalDateTime;
 import java.util.List;
@@ -57,6 +58,8 @@ public class GroupDto {
         @Min(value = 2, message = "최대 인원수는 2명 이상이어야 합니다.")
         @Max(value = 100, message = "최대 인원수는 100명 이하이어야 합니다.")
         private int maxMembers;
+        private MultipartFile image;
+        private String imageUrl;
     }
 
     // 모임 수정 요청 DTO
@@ -96,6 +99,7 @@ public class GroupDto {
         private String sportName;
         private boolean leader;
         private ApprovalStatus approvalStatus;
+        private String imageUrl;
 
         @Builder
         public MyGroupResponse(Group group, User currentUser) {
@@ -106,6 +110,7 @@ public class GroupDto {
             this.sportName = group.getSport().getSportName();
             this.leader = group.getLeader().getId().equals(currentUser.getId());
             this.approvalStatus = group.getApprovalStatus();
+            this.imageUrl = group.getImageUrl();
         }
 
         public MyGroupResponse(Group group) {
@@ -116,6 +121,7 @@ public class GroupDto {
             this.sportName = group.getSport().getSportName();
             this.leader = false; // 현재 사용자를 알 수 없으므로 기본값 false
             this.approvalStatus = group.getApprovalStatus();
+            this.imageUrl = group.getImageUrl();
         }
     }
 
@@ -132,8 +138,9 @@ public class GroupDto {
         private int maxMembers;
         private long currentMembers;
         private List<ScheduleDto.ScheduleResponse> schedules;
-        private UserDto.MemberInfoResponse leaderInfo; // [추가] 모임장 정보
-        private List<UserDto.MemberInfoResponse> members; // [추가] 멤버 목록
+        private UserDto.MemberInfoResponse leaderInfo;
+        private List<UserDto.MemberInfoResponse> members;
+        private String imageUrl;
 
         @Builder
         public GroupDetailResponse(Group group, long currentMembers, List<UserDto.MemberInfoResponse> members) {
@@ -150,6 +157,7 @@ public class GroupDto {
             this.schedules = group.getSchedules().stream()
                     .map(schedule -> ScheduleDto.ScheduleResponse.builder().schedule(schedule).build())
                     .collect(Collectors.toList());
+            this.imageUrl = group.getImageUrl();
         }
     }
 

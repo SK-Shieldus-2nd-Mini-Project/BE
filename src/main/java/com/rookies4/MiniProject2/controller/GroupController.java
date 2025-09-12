@@ -10,6 +10,8 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile; // [추가]
+
 
 import java.util.List;
 
@@ -29,12 +31,13 @@ public class GroupController {
     }
 
     // 모임 생성 API
-    @PostMapping
+     @PostMapping
     public ResponseEntity<GroupDto.CreateResponse> createGroup(
-            @Valid @RequestBody GroupDto.CreateRequest request,
+            @Valid @RequestPart("request") GroupDto.CreateRequest request, // JSON 데이터
+            @RequestPart(value = "image", required = false) MultipartFile imageFile, // 이미지 파일
             @AuthenticationPrincipal UserDetails userDetails) {
 
-        GroupDto.CreateResponse response = groupService.createGroup(request, userDetails.getUsername());
+        GroupDto.CreateResponse response = groupService.createGroup(request, imageFile, userDetails.getUsername());
         return ResponseEntity.status(HttpStatus.CREATED).body(response);
     }
 

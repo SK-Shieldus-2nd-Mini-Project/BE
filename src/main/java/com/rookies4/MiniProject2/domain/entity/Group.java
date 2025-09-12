@@ -69,4 +69,7 @@ public class Group {
             this.approvalStatus = ApprovalStatus.PENDING;
         }
     }
+
+    @Column(name = "image_url")
+    private String imageUrl;
 }

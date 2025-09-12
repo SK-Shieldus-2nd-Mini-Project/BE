@@ -24,7 +24,13 @@ import java.util.stream.Collectors;
 import java.util.stream.Stream;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.util.StringUtils;
-
+import org.springframework.web.multipart.MultipartFile; // [추가]
+import java.io.IOException; // [추가]
+import java.nio.file.Files; // [추가]
+import java.nio.file.Path; // [추가]
+import java.nio.file.Paths; // [추가]
+import java.util.UUID; // [추가]
+import org.springframework.beans.factory.annotation.Value; // [추가]
 @Slf4j
 @Service
 @RequiredArgsConstructor
@@ -37,9 +43,12 @@ public class GroupService {
     private final RegionRepository regionRepository;
     private final SportRepository sportRepository;
 
+    @Value("${file.upload-dir}") //application.properties의 값 주입
+    private String uploadDir;
+
     // [사용자] 모임 생성 메서드
     @Transactional
-    public GroupDto.CreateResponse createGroup(GroupDto.CreateRequest request, String username) {
+    public GroupDto.CreateResponse createGroup(GroupDto.CreateRequest request,MultipartFile imageFile, String username) {
         User leader = userRepository.findByUsername(username)
                 .orElseThrow(() -> new EntityNotFoundException(ErrorCode.USER_NOT_FOUND));
 
@@ -49,6 +58,28 @@ public class GroupService {
         Sport sport = sportRepository.findById(request.getSportId())
                 .orElseThrow(() -> new EntityNotFoundException(ErrorCode.SPORT_NOT_FOUND));
 
+        String imageUrl = null;
+        if (imageFile != null && !imageFile.isEmpty()) {
+            try {
+                // 고유한 파일 이름 생성
+                String originalFilename = imageFile.getOriginalFilename();
+                String extension = originalFilename.substring(originalFilename.lastIndexOf("."));
+                String savedFilename = UUID.randomUUID().toString() + extension;
+
+                // 파일을 지정된 경로에 저장
+                Path uploadPath = Paths.get(uploadDir).toAbsolutePath().normalize();
+                Files.createDirectories(uploadPath); // 폴더가 없으면 생성
+                Path destinationPath = uploadPath.resolve(savedFilename);
+                imageFile.transferTo(destinationPath.toFile());
+
+                // 웹 접근 가능 URL 생성
+                imageUrl = "/images/" + savedFilename;
+            } catch (IOException e) {
+                // 실제 프로덕션에서는 더 정교한 예외 처리가 필요합니다.
+                throw new RuntimeException("이미지 저장에 실패했습니다.", e);
+            }
+        }
+
         Group newGroup = Group.builder()
                 .groupName(request.getGroupName())
                 .description(request.getDescription())
@@ -56,6 +87,7 @@ public class GroupService {
                 .region(region)
                 .sport(sport)
                 .maxMembers(request.getMaxMembers())
+                .imageUrl(imageUrl)
                 .build();
 
         leader.getLeadingGroups().add(newGroup);
