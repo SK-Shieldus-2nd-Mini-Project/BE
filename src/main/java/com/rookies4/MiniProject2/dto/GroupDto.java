@@ -125,26 +125,30 @@ public class GroupDto {
     public static class GroupDetailResponse {
         private Long groupId;
         private String groupName;
-        private String leaderNickname;
+//        private String leaderNickname;
         private String regionName;
         private String sportName;
         private String description;
         private int maxMembers;
         private long currentMembers;
         private List<ScheduleDto.ScheduleResponse> schedules;
+        private UserDto.MemberInfoResponse leaderInfo; // [추가] 모임장 정보
+        private List<UserDto.MemberInfoResponse> members; // [추가] 멤버 목록
 
         @Builder
-        public GroupDetailResponse(Group group, long currentMembers) {
+        public GroupDetailResponse(Group group, long currentMembers, List<UserDto.MemberInfoResponse> members) {
             this.groupId = group.getId();
             this.groupName = group.getGroupName();
-            this.leaderNickname = group.getLeader().getNickname();
+//            this.leaderNickname = group.getLeader().getNickname();
             this.regionName = group.getRegion().getRegionName();
             this.sportName = group.getSport().getSportName();
             this.description = group.getDescription();
             this.maxMembers = group.getMaxMembers();
             this.currentMembers = currentMembers;
+            this.leaderInfo = UserDto.MemberInfoResponse.builder().user(group.getLeader()).build(); // [수정]
+            this.members = members;
             this.schedules = group.getSchedules().stream()
-                    .map(schedule -> ScheduleDto.ScheduleResponse.builder().schedule(schedule).build()) // ScheduleResponse DTO 리스트로 변환
+                    .map(schedule -> ScheduleDto.ScheduleResponse.builder().schedule(schedule).build())
                     .collect(Collectors.toList());
         }
     }

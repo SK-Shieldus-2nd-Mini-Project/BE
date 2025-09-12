@@ -72,4 +72,19 @@ public class UserDto {
             this.profileImageUrl = user.getProfileImageUrl();
         }
     }
+
+    @Getter
+    @NoArgsConstructor
+    public static class MemberInfoResponse {
+        private Long userId;
+        private String nickname;
+        private String profileImageUrl;
+
+        @Builder
+        public MemberInfoResponse(User user) {
+            this.userId = user.getId();
+            this.nickname = user.getNickname();
+            this.profileImageUrl = user.getProfileImageUrl();
+        }
+    }
 }

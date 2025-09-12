@@ -125,10 +125,18 @@ public class GroupService {
         // ==================== [수정] 페치 조인으로 Group과 연관 엔티티 함께 조회 ====================
         Group group = groupRepository.findByIdWithDetails(groupId)
                 .orElseThrow(() -> new EntityNotFoundException(ErrorCode.GROUP_NOT_FOUND));
-        long currentMembers = groupMemberRepository.countByGroupAndStatus(group, JoinStatus.APPROVED);
+
+        List<UserDto.MemberInfoResponse> members = groupMemberRepository.findByGroupAndStatus(group, JoinStatus.APPROVED)
+                .stream()
+                .map(groupMember -> UserDto.MemberInfoResponse.builder().user(groupMember.getUser()).build())
+                .collect(Collectors.toList());
+
+        long currentMembers = members.size() + 1;
+
         return GroupDto.GroupDetailResponse.builder()
                 .group(group)
                 .currentMembers(currentMembers)
+                .members(members)
                 .build();
     }
 
