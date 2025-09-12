@@ -193,7 +193,7 @@ public class GroupService {
 
         // 최대 인원수 확인 로직, 최대인원수 넘어가면 신청 불가
         long currentMembers = groupMemberRepository.countByGroupAndStatus(group, JoinStatus.APPROVED);
-        if(currentMembers >= group.getMaxMembers()){
+        if (currentMembers + 1 >= group.getMaxMembers()) {
             throw new BusinessLogicException(ErrorCode.MAX_MEMBERS_REACHED);
         }
 
@@ -213,6 +213,11 @@ public class GroupService {
 
         User leader = userRepository.findByUsername(leaderUsername)
                 .orElseThrow(() -> new EntityNotFoundException(ErrorCode.USER_NOT_FOUND));
+
+        long currentMembers = groupMemberRepository.countByGroupAndStatus(group, JoinStatus.APPROVED);
+        if (currentMembers + 1 >= group.getMaxMembers()) {
+            throw new BusinessLogicException(ErrorCode.MAX_MEMBERS_REACHED);
+        }
 
         // 요청한 사용자가 실제 모임의 리더인지 확인
         if (!group.getLeader().getId().equals(leader.getId())) {
