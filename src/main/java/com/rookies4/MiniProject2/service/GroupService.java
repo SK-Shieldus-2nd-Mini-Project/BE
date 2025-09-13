@@ -191,6 +191,10 @@ public class GroupService {
             throw new BusinessLogicException(ErrorCode.LEADER_CANNOT_JOIN);
         }
 
+         if (user.getRole() == Role.ADMIN) {
+            // ADMIN 역할일 경우, BusinessLogicException을 발생시켜 가입을 막습니다.
+            throw new BusinessLogicException(ErrorCode.ACCESS_DENIED); // 임시로 ACCESS_DENIED 사용
+        }
         // 최대 인원수 확인 로직, 최대인원수 넘어가면 신청 불가
         long currentMembers = groupMemberRepository.countByGroupAndStatus(group, JoinStatus.APPROVED);
         if (currentMembers + 1 >= group.getMaxMembers()) {
