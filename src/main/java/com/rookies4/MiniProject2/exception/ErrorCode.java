@@ -34,7 +34,7 @@ public enum ErrorCode {
     UPDATE_MAX_MEMBER_INVALID(HttpStatus.BAD_REQUEST, "G007", "최대 인원수는 현재 인원수보다 적게 설정할 수 없습니다."),
     NOT_A_MEMBER(HttpStatus.BAD_REQUEST, "G008", "해당 모임의 멤버가 아닙니다."),
     NOT_APPROVED_MEMBER(HttpStatus.BAD_REQUEST, "G009", "가입 승인된 멤버만 탈퇴가 가능합니다."),
-
+    ADMIN_CANNOT_CREATE_GROUP(HttpStatus.FORBIDDEN, "G010", "관리자는 모임을 생성할 수 없습니다."),
 
     // Schedule
     SCHEDULE_NOT_FOUND(HttpStatus.NOT_FOUND, "S001", "해당 일정을 찾을 수 없습니다."),

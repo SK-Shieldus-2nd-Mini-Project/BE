@@ -52,6 +52,9 @@ public class GroupService {
         User leader = userRepository.findByUsername(username)
                 .orElseThrow(() -> new EntityNotFoundException(ErrorCode.USER_NOT_FOUND));
 
+        if (leader.getRole() == Role.ADMIN) {
+        throw new BusinessLogicException(ErrorCode.ADMIN_CANNOT_CREATE_GROUP); // 전용 에러 코드를 사용하는 것이 좋습니다.
+    }
         Region region = regionRepository.findById(request.getRegionId())
                 .orElseThrow(() -> new EntityNotFoundException(ErrorCode.REGION_NOT_FOUND));
 
