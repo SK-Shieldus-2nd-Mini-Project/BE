@@ -3,6 +3,7 @@ package com.rookies4.MiniProject2.domain.entity;
 import com.rookies4.MiniProject2.domain.enums.Role;
 import jakarta.persistence.*;
 import lombok.*;
+import org.hibernate.annotations.BatchSize;
 
 import java.time.LocalDate;
 import java.util.ArrayList;
@@ -41,9 +42,11 @@ public class User {
     @Column(nullable = false, length = 10)
     private Role role;
 
+    @BatchSize(size = 100)
     @OneToMany(mappedBy = "leader", cascade = CascadeType.ALL)
     private List<Group> leadingGroups = new ArrayList<>();
 
+    @BatchSize(size = 100)
     @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<GroupMember> groupMembers = new ArrayList<>();
 }
